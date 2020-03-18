@@ -25,9 +25,9 @@ ELSE (WIN32)
 	ADD_DEFINITIONS( -g -std=c++17 -Wall -Wno-sign-compare )
 	ADD_DEFINITIONS( -Wl,--whole-archive -Wl,--no-while-archive, -Wno-deprecated-declarations )
 
-	include_directories(/opt/boost/1.67.0/include/ /opt/cppcms/1.2.0/include)
+	include_directories(/opt/boost/1.71.0/include/ /opt/cppcms/1.2.1/include)
 
-	LINK_DIRECTORIES(/opt/boost/1.67.0/lib/ /opt/cppcms/1.2.0/lib)
+	LINK_DIRECTORIES(/opt/boost/1.71.0/lib/ /opt/cppcms/1.2.1/lib)
 
 ENDIF (WIN32)
 
