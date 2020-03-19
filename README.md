@@ -13,6 +13,10 @@ The documentation ie. the requirement specification is available but will not be
 Log:
 ========
 
+2020-03-17 PBondo
+-----------------
+Fix lss disconnect issue. Bump release 1.6.1
+
 
 Timeout on server end when data stops flowing from LSS?
 
