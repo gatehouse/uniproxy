@@ -236,7 +236,7 @@ void RemoteProxyClient::local_threadproc()
       this->dolog(dinfo() + exc.what());
    }
    DOUT(this->dinfo() << "Thread stopping");
-   this->interrupt(true);
+   this->interrupt(false);
    DOUT(this->dinfo() << "Thread stopped");
 }
 
