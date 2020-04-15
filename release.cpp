@@ -19,4 +19,4 @@
 //====================================================================
 
 const char * release = "GateHouse A/S (C) 2011-2019 Uniproxy";
-const char * version = "1.6.1";
+const char * version = "1.6.2";
