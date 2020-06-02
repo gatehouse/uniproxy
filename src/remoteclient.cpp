@@ -687,7 +687,7 @@ void RemoteProxyHost::handle_accept(RemoteProxyClient* new_session, const boost:
             {
                pHelp->stop();
                iter2 = this->m_clients.erase( iter2 );
-               delete pHelp;
+//NB!!               delete pHelp; // This may cause a timer based cleanup function in asio to access after delete.
             }
             else
             {
