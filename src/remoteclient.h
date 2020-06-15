@@ -59,7 +59,7 @@ public:
    RemoteEndpoint m_endpoint;
    boost::asio::ip::tcp::socket m_local_socket;
    ssl_socket m_remote_socket;
-   std::mutex m_mutex;
+   mutable std::mutex m_mutex;
 
    data_flow m_count_in, m_count_out;
 
@@ -67,6 +67,18 @@ public:
    boost::posix_time::ptime m_last_incoming_stamp, m_last_outgoing_stamp;
 
    std::string dinfo();
+
+   bool is_stopped()
+   {
+      return !this->is_active()
+         && this->m_stopped != std::chrono::system_clock::time_point()
+         && std::chrono::system_clock::now() > this->m_stopped + std::chrono::seconds(10);
+   }
+
+   std::chrono::system_clock::time_point stopped() const
+   {
+      return this->m_stopped;
+   }
 
 protected:
 
@@ -82,6 +94,8 @@ protected:
    boost::asio::io_service& m_io_service;
 
    boost::asio::ip::tcp::endpoint m_remote_cache, m_local_cache;
+
+   std::chrono::system_clock::time_point m_stopped = std::chrono::system_clock::time_point();
 
    RemoteProxyHost &m_host;
 };
