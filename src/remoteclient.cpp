@@ -160,6 +160,10 @@ void RemoteProxyClient::stop()
    // The threads are stopped and joined.
    this->m_local_thread.stop();
    this->m_remote_thread.stop();
+   if (this->m_stopped == std::chrono::system_clock::time_point())
+   {
+      this->m_stopped = std::chrono::system_clock::now();
+   }
 }
 
 
@@ -459,6 +463,11 @@ void RemoteProxyClient::remote_threadproc()
    DOUT(this->dinfo() << "Thread stopping");
    this->interrupt(true);
    {
+      mylib::msleep(1000);
+      {
+         std::lock_guard<std::mutex> l(this->m_mutex); // We use the mutex here to sync from the previous operations
+      }
+      mylib::msleep(1000);
       // NB!! Notice we cannot use the mutex here because the shutdown operation may linger.
       boost::system::error_code ec;
       DOUT("synced shutdown remote socket enter");
@@ -683,11 +692,14 @@ void RemoteProxyHost::handle_accept(RemoteProxyClient* new_session, const boost:
          for ( auto iter2 = this->m_clients.begin(); iter2 != this->m_clients.end(); )
          {
             RemoteProxyClient *pHelp = *iter2;
-            if ( ! pHelp->is_active() )
+            if (pHelp->stopped() == std::chrono::system_clock::time_point())
             {
                pHelp->stop();
+            }
+            if (pHelp->is_stopped())
+            {
                iter2 = this->m_clients.erase( iter2 );
-               delete pHelp;
+               delete pHelp; // This may cause a timer based cleanup function in asio to access after delete.
             }
             else
             {
