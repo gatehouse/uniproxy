@@ -169,7 +169,6 @@ void RemoteProxyClient::stop()
 
 void RemoteProxyClient::interrupt(bool synced)
 {
-   boost::system::error_code ec;
    DOUT(this->dinfo() << " synced: " << synced << " local: " << this->m_local_connected << " remote: " << this->m_remote_connected);
    if (int sock = get_socket(&this->m_local_socket, this->m_mutex); sock != 0)
    {
