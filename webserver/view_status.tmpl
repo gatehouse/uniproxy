@@ -26,11 +26,11 @@ div.connection_error{ background-color: red; }
 var status1 = null;
 
 
-function timestamp_to_string( ts2 )
+function timestamp_to_string()
 {
 	var ts = new Date();
-	ts = ts2;
-	var sz = " " + ts.getUTCFullYear() + "-" + (ts.getUTCMonth() + 1) + "-" + ts.getUTCDate() + " " + ts.getUTCHours() + ":" + ts.getUTCMinutes() + ":" + ts.getUTCSeconds();
+   ts.setMilliseconds(0);
+   var sz = ts.toISOString().replace("T", " ").replace("Z", "").replace(".000", "");
 	return sz
 }
 
@@ -353,7 +353,7 @@ Status.prototype.on_status_update1 = function( data )
 Status.prototype.do_get_update = function( )
 {
 	// Make sure we keep running, even if there are problems.
-	this.reload(5000);
+	this.reload(1000);
 	try
 	{
 		var that = this;
@@ -363,14 +363,14 @@ Status.prototype.do_get_update = function( )
 			success: function(data)
 			{
 				
-				$("#status").html("Running" + timestamp_to_string( new Date() ) + " UTC" );
+				$("#status").html("Running " + timestamp_to_string() + " UTC" );
 				$("#status").removeClass();
 				that.on_status_update1( data );
 				that.do_get_log();
 			},
 			error: function()
 			{
-				$("#status").html("No connection to proxy" + timestamp_to_string( new Date() ) + " UTC" );
+				$("#status").html("No connection to proxy " + timestamp_to_string() + " UTC" );
 				$("#status").removeClass().addClass('connection_error');
 				$("#clients").html("");
 				$("#hosts").html("");

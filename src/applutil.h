@@ -197,13 +197,16 @@ public:
    {
       this->m_stop = true;
       // NB!! Check if we are self threading. then we should simply call check_run
-      if ( this->m_interrupt_function != nullptr )
+      if (this->m_thread.joinable())
       {
-         this->m_interrupt_function();
-      }
-      if ( _wait && this->m_thread.joinable() )
-      {
-         this->m_thread.join();
+         if ( this->m_interrupt_function != nullptr )
+         {
+            this->m_interrupt_function();
+         }
+         if ( _wait && this->m_thread.joinable() )
+         {
+            this->m_thread.join();
+         }
       }
    }
 
@@ -617,5 +620,22 @@ template <class T> std::ostream& operator << (std::ostream& os, const std::vecto
    return os;
 }
 
+class scope_exit
+{
+public:
+   scope_exit(std::function<void()> f)
+   : m_func(f)
+   {}
+
+   ~scope_exit()
+   {
+      if (this->m_func != nullptr)
+      {
+         this->m_func();
+      }
+   }
+
+   std::function<void()> m_func;
+};
 
 #endif

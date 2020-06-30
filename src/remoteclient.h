@@ -27,9 +27,16 @@ class RemoteProxyHost;
 //
 // This class handles connection from remote proxy clients
 //
-class RemoteProxyClient
+class RemoteProxyClient : public boost::enable_shared_from_this<RemoteProxyClient>
 {
 public:
+
+   typedef boost::shared_ptr<RemoteProxyClient> pointer;
+
+   static pointer create(boost::asio::io_context& io_context, boost::asio::ssl::context& context, RemoteProxyHost &_host)
+   {
+      return pointer(new RemoteProxyClient(io_context, context, _host));
+   }
 
    RemoteProxyClient(boost::asio::io_service& io_service, boost::asio::ssl::context& context, RemoteProxyHost &_host );
    ~RemoteProxyClient();
@@ -67,13 +74,6 @@ public:
    boost::posix_time::ptime m_last_incoming_stamp, m_last_outgoing_stamp;
 
    std::string dinfo();
-
-   bool is_stopped()
-   {
-      return !this->is_active()
-         && this->m_stopped != std::chrono::system_clock::time_point()
-         && std::chrono::system_clock::now() > this->m_stopped + std::chrono::seconds(10);
-   }
 
    std::chrono::system_clock::time_point stopped() const
    {
@@ -132,9 +132,12 @@ public:
 
    void dolog(const std::string &_line);
 
+   void check_deadline(const boost::system::error_code& error);
+   boost::asio::deadline_timer *m_pdeadline = nullptr;
+
 protected:
 
-   void handle_accept( RemoteProxyClient* new_session, const boost::system::error_code& error);
+   void handle_accept( RemoteProxyClient::pointer new_session, const boost::system::error_code& error);
 
    std::string get_password() const;
 
@@ -166,7 +169,7 @@ protected:
 
    // The following sections shall be protected by a gate
    mutable std::mutex m_mutex;
-   std::vector<RemoteProxyClient*> m_clients; // NB!! This should be some shared_ptr or so ??
+   std::vector<RemoteProxyClient::pointer> m_clients;
 
    mutable std::mutex m_mutex_log;
    std::string m_log;
