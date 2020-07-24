@@ -13,6 +13,14 @@ The documentation ie. the requirement specification is available but will not be
 Log:
 ========
 
+2020-07-24 PBondo
+-----------------
+Bump release 1.7.0
+
+Fix slow memory leak (side effect frem previous fix)
+Fix allow only one connection on server end (side effect frem previous fix)
+Fix 2 minor data races for printout.
+
 2020-03-17 PBondo
 -----------------
 Fix lss disconnect issue. Bump release 1.6.1

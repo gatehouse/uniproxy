@@ -87,13 +87,11 @@ protected:
    unsigned char *m_remote_read_buffer;
    unsigned char *m_local_read_buffer;
 
-   bool m_local_connected, m_remote_connected;
+   std::atomic<bool> m_local_connected, m_remote_connected;
 
    mylib::thread m_remote_thread, m_local_thread;
    std::vector<LocalEndpoint> m_local_ep;
    boost::asio::io_service& m_io_service;
-
-   boost::asio::ip::tcp::endpoint m_remote_cache, m_local_cache;
 
    std::chrono::system_clock::time_point m_stopped = std::chrono::system_clock::time_point();
 

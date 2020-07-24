@@ -78,25 +78,12 @@ RemoteProxyClient::~RemoteProxyClient()
 
 std::string RemoteProxyClient::dinfo()
 {
-   std::string cached;
    boost::system::error_code ec;
    boost::asio::ip::tcp::endpoint ep_local = this->m_local_socket.lowest_layer().remote_endpoint(ec);
-   if (!ec)
-   {
-      this->m_local_cache = ep_local;
-   }
    boost::asio::ip::tcp::endpoint ep_remote = this->m_remote_socket.lowest_layer().remote_endpoint(ec);
-   if (!ec)
-   {
-      this->m_remote_cache = ep_remote;
-   }
-   else
-   {
-      cached = " Cached.";
-   }
 
    std::ostringstream oss;
-   oss << this->m_remote_cache << " => " << this->m_local_cache << cached << " ";
+   oss << ep_remote << " => " << ep_local << " ";
    return oss.str();
 }
 
