@@ -500,7 +500,6 @@ public:
    {
       this->m_type = _type;
       plugins().push_back( this );
-      std::cout << "PluginHandler: " << this->m_type << " " << plugins().size() << std::endl;
    }
 
    static std::vector<PluginHandler*> &plugins()
