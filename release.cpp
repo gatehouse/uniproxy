@@ -18,5 +18,5 @@
 // mailto:gh@gatehouse.dk
 //====================================================================
 
-const char * release = "GateHouse A/S (C) 2011-2019 Uniproxy";
-const char * version = "1.7.1";
+const char * release = "GateHouse A/S (C) 2011-2020 Uniproxy";
+const char * version = "1.7.2";
