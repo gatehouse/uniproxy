@@ -1,4 +1,4 @@
 [Files]
 
 #define BUILDNUMBER "1"
-#define VERSIONNUMBER "v1.7.0"
+#define VERSIONNUMBER "v1.7.2"
