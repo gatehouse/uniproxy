@@ -333,7 +333,7 @@ void proxy_app::config_upload()
                log().add("Updated configuration without restart, now starting all connections");
                global.lock();
             }
-            catch(std::exception exc)
+            catch(std::exception& exc)
             {
                log().add("Configuration update failed to warrant a restart. All connections will be closed");
                throw mylib::reload_exception();

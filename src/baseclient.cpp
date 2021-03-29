@@ -152,7 +152,7 @@ void BaseClient::stop_activate()
 
 void BaseClient::start_activate(int _index)
 {
-   this->m_thread_activate.start([=](){this->threadproc_activate(_index);});  
+   this->m_thread_activate.start([this,_index](){this->threadproc_activate(_index);});
 }
 
 
