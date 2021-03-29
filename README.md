@@ -13,6 +13,14 @@ The documentation ie. the requirement specification is available but will not be
 Log:
 ========
 
+2021-03-29 PBondo
+-----------------
+Bump release 1.7.3
+
+Fix issue on server with 50 (30+) simultanous client connects e.g. on restart with active clients.
+Fix issue on server with potential hang on ssl shutdown (this was previously fixed on client). Can be provoked with a client docker pause
+Fix a couple of c++20 compiler warnings
+
 2020-07-24 PBondo
 -----------------
 Bump release 1.7.0
