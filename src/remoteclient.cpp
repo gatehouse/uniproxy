@@ -459,7 +459,9 @@ void RemoteProxyClient::remote_threadproc()
       // NB!! Notice we cannot use the mutex here because the shutdown operation may linger.
       boost::system::error_code ec;
       DOUT("synced shutdown remote socket enter");
-      this->m_remote_socket.shutdown(ec);
+      //this->m_remote_socket.shutdown(ec); // This literally requires the client end to be available otherwise we are stuck here forever, e.g. docker pause
+      this->m_remote_socket.lowest_layer().shutdown(boost::asio::ip::tcp::socket::shutdown_both, ec);
+      DOUT("synced shutdown remote socket close");
       this->m_remote_socket.lowest_layer().close(ec);
       DOUT("synced shutdown remote socket done " << ec);
    }
@@ -740,11 +742,6 @@ void RemoteProxyHost::handle_accept(RemoteProxyClient::pointer new_session, cons
          load_verify_file(this->m_context, my_certs_name);
          this->m_clients.push_back( new_session );
          new_session->start( this->m_local_ep );
-
-         mylib::msleep(1000);
-         DOUT(this->dinfo() << "Trying to reload verify file");
-         load_verify_file(this->m_context, my_certs_name);
-         // This call is not multithread safe. load_certificate_names( my_certs_name );
 
          // We create the next one, which is then waiting for a connection.
          new_session = RemoteProxyClient::create(m_io_service, m_context,*this);

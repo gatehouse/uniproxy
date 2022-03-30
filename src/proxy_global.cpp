@@ -1116,7 +1116,7 @@ void activate_host::start(int _port)
    if (!this->mylib::thread::is_running())
    {
       DOUT("Starting activation host on port: " << _port);
-      this->mylib::thread::start([=]{this->threadproc(_port);});
+      this->mylib::thread::start([this,_port]{this->threadproc(_port);});
    }
    else
    {
