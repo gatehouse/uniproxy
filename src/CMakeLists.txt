@@ -77,7 +77,7 @@ IF (WIN32)
 
 	add_executable( ${PROJECT_NAME} ${CPP_SOURCE})
 
-	target_link_libraries (${PROJECT_NAME} gatehouse cppcms booster libcrypto libssl)
+	target_link_libraries (${PROJECT_NAME} gatehouse ${CPPCMS_LIBRARY} libcrypto libssl)
 
 ELSE()
 
