@@ -713,6 +713,7 @@ bool proxy_global::execute_openssl()
 //
 bool proxy_global::load_configuration()
 {
+   DOUT("Loading configuration from " << config_filename);
    static int openssl_count = 0;
    std::string certificate_common_name;
    try
@@ -908,7 +909,7 @@ bool proxy_global::load_certificate_names( const std::string & _filename )
 }
 
 
-std::string proxy_global::SetupCertificatesServer(boost::asio::ip::tcp::socket &_remote, const std::vector<std::string> &_certnames)
+std::string proxy_global::SetupCertificatesServer(boost::asio::ip::tcp::socket& _remote, const std::vector<std::string>& _certnames)
 {
    try
    {
@@ -968,14 +969,15 @@ bool proxy_global::SetupCertificatesClient(boost::asio::ip::tcp::socket &_remote
    {
       DOUT(info(_remote) << __FUNCTION__ << " connection name: " << _connection_name );
       const int buffer_size = 4000;
-      char buffer[buffer_size]; //
-      memset(buffer,0,buffer_size);
+      char buffer[buffer_size];
+      memset(buffer, 0, buffer_size);
       ASSERTE( _connection_name.length() > 0, uniproxy::error::connection_name_unknown, "" );
 
       std::string cert = readfile( my_public_cert_name );
       ASSERTE( cert.length() > 0, uniproxy::error::certificate_not_found, std::string( " certificate not found in file: ") + my_certs_name );
       int count = _remote.write_some( boost::asio::buffer( cert, cert.length() ) );
       DOUT(info(_remote) << "Wrote certificate: " << count << " of " << cert.length() << " bytes ");
+      DOUT("Sent: " << cert);
       return true;
    }
    catch( std::exception &exc )

@@ -737,7 +737,7 @@ bool EnableFirewallRule()
         return false;
     }
 
-    // Add Windows Messenger to the authorized application collection.
+    // Add the Uniproxy to the authorized application collection.
     hr = WindowsFirewallAddApp(
             fwProfile,
             L"%ProgramFiles%\\uniproxy\\uniproxy.exe",

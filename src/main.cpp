@@ -388,22 +388,22 @@ void proxy_app::setup_config( cppcms::json::value &settings_object )
       settings_object["http"]["script"]="/json";
    }
    #ifdef _WIN32
-   std::string coockie_path = getenv("TEMP");
-   if ( !coockie_path.length() )
+   std::string cookie_path = getenv("TEMP");
+   if ( !cookie_path.length() )
    {
-      coockie_path = "c:/temp";
+      cookie_path = "c:/temp";
    }
    #else
-   std::string coockie_path = "/tmp";
+   std::string cookie_path = "/tmp";
    #endif
-   std::string coockie = "uniproxy" + mylib::to_string(global.m_web_port);
+   std::string cookie = "uniproxy" + mylib::to_string(global.m_web_port);
    settings_object["service"]["api"]="http";
    settings_object["service"]["port"]= global.m_web_port;
    settings_object["service"]["ip"]= global.m_ip4_mask;
    settings_object["session"]["location"] = "client";
-   settings_object["session"]["cookies"]["prefix"] = coockie;
+   settings_object["session"]["cookies"]["prefix"] = cookie;
    settings_object["session"]["server"]["storage"] = "files"; //memory";
-   settings_object["session"]["server"]["dir"] = coockie_path + "/uniproxy_" + boost::posix_time::to_iso_string(boost::get_system_time().time_of_day() ).substr(0,6);
+   settings_object["session"]["server"]["dir"] = cookie_path + "/uniproxy_" + boost::posix_time::to_iso_string(boost::get_system_time().time_of_day() ).substr(0,6);
    settings_object["session"]["client"]["encryptor"] = "hmac";
    settings_object["session"]["client"]["key"] = "29b6e071ad5870228c6a2115d88d3b2e";
    settings_object["service"]["worker_threads"] = 5; // Default = 5 * #CPU
