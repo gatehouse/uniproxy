@@ -121,19 +121,18 @@ void BaseClient::threadproc_activate(int index)
          boost::asio::sockect_connect(socket, io_service, this->remote_hostname(), this->m_activate_port);
 
          RemoteEndpoint &ep = this->m_proxy_endpoints[index];
-         std::error_code err;
          this->dolog("Activate Attempting to perform certificate exchange with " + ep.m_name );
          this->m_activate_stamp = boost::get_system_time(); // Reset to current time to avoid double attempts.
          std::vector<std::string> certnames;
          certnames.push_back(ep.m_name);
          if (global.SetupCertificatesClient(socket, certnames.front()) &&
-            !global.SetupCertificatesServer( socket, certnames).empty() )
+             !global.SetupCertificatesServer(socket, certnames).empty())
          {
             this->dolog("Succeeded in exchanging certificates with " + certnames.front());
          }
          else
          {
-            this->dolog("Failed to exchange certificate: " + err.message() );
+            this->dolog("Failed to exchange certificate");
          }
       }        
       catch(std::exception &exc)
