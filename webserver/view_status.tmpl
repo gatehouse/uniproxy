@@ -8,6 +8,8 @@
 div.connection_ok{ background-color: green; }
 div.connection_warning{ background-color: yellow; }
 div.connection_error{ background-color: red; }
+body { font:80% Verdana,Tahoma,Arial,sans-serif; }
+h1, h2, h3, h4 {  font-family: "Trebuchet MS",Georgia,"Times New Roman",serif; }
 </style>
 <% end template %>
 
@@ -344,7 +346,6 @@ Status.prototype.on_status_update1 = function( data )
 	sz_html += "</table>";
 	$("#version").html( (json_data.version) ? (json_data.version) : "&nbsp;" );
 	$("#hosts").html( sz_html );
-
 	$("#own_name").html( (json_data.global.name) ? (json_data.global.name) : "&nbsp;" );
 }
 
@@ -529,9 +530,7 @@ $(document).ready(function()
 
 
 <% template mainview() %>
-<table>
-<tr><td><h2>UniProxy(</h2></td><td><h2> <div id="own_name"></div> </h2></td><td><h2>)</h2></td></tr>
-</table>
+<h2>UniProxy (<span id="own_name"></span>)</h2>
 <div id="clients" data-role="collapsible" data-collapsed="false" ></div>
 <div id="providers"></div>
 <div id="hosts"></div>
