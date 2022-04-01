@@ -11,11 +11,12 @@
 // This version is released under the GNU General Public License with restrictions.
 // See the doc/license.txt file.
 //
-// Copyright (C) 2011-2019 by GateHouse A/S
+// Copyright (C) 2011-2021 by GateHouse A/S
 // All Rights Reserved.
 // http://www.gatehouse.dk
 // mailto:gh@gatehouse.dk
 //====================================================================
+
 #ifndef _proxy_global_h
 #define _proxy_global_h
 
@@ -171,8 +172,9 @@ public:
    std::vector<std::string> m_cert_names;
    bool load_certificate_names( const std::string & _filename );
 
-   bool SetupCertificatesClient( boost::asio::ip::tcp::socket &_remote_socket, const std::string &_connection_name);
-   std::string SetupCertificatesServer( boost::asio::ip::tcp::socket &_remote_socket, const std::vector<std::string> &_connection_names);
+   bool SetupCertificatesClient(boost::asio::ip::tcp::socket& _remote_socket, const std::string& _connection_name);
+   std::string SetupCertificatesServer(boost::asio::ip::tcp::socket& _remote_socket,
+                                       const std::vector<std::string>& _connection_names);
 
    bool certificate_available( const std::string &_cert_name);
    bool execute_openssl();
