@@ -28,10 +28,10 @@ var status1 = null;
 
 function timestamp_to_string()
 {
-	var ts = new Date();
+   var ts = new Date();
    ts.setMilliseconds(0);
    var sz = ts.toISOString().replace("T", " ").replace("Z", "").replace(".000", "");
-	return sz
+   return sz
 }
 
 
@@ -47,7 +47,6 @@ var Status = function()
 
 Status.prototype.do_add_lines = function( text )
 {
-
 	var something_was_added = 0;
 	var testdiv_outer = jQuery("#testdiv_outer");
 	var testdiv = jQuery("#testdiv_outer > .testdiv_inner");
@@ -387,7 +386,7 @@ Status.prototype.do_get_update = function( )
 Status.prototype.on_client_activate = function( id, name )
 {
 	console.log( "on_client_activate: " + name );
-	if (confirm("Activate certificate for: " + name + " ?. Please notice the host at the other end must be activated first" ))
+	if (confirm("Activate certificate for '" + name + "'? Please note the host at the other end must be activated first" ))
 	{
 		jQuery.ajax({ url: '/json/command/client/activate/name=' + name + '&id=' + id + '&dummy=' + this.cache_count++ });
 		this.reload(200);
@@ -398,7 +397,7 @@ Status.prototype.on_client_activate = function( id, name )
 Status.prototype.on_client_active = function( cb, id, name )
 {
 	console.log( "on_client_active: " + name );
-	if (confirm("(De)Active for: " + name + " ?. Please notice this is NOT stored persistent, so it will be reset after next restart" ))
+	if (confirm("(De)activate for '" + name + "'? Please note this is NOT persistent, so it will be reset after next restart"))
 	{
 		jQuery.ajax({ url: '/json/command/client/active/name=' + name + '&id=' + id + '&check=' + cb.checked + '&dummy=' + this.cache_count++ });
 		this.reload(200);
@@ -411,7 +410,7 @@ Status.prototype.on_client_active = function( cb, id, name )
 Status.prototype.on_client_delete = function( name )
 {
 	console.log( "on_client_delete: " + name );
-	if (confirm("Delete certificate for: " + name + " ?" ))
+	if (confirm("Delete certificate for '" + name + "'?"))
 	{
 		jQuery.ajax({ url: '/json/command/client/delete/name=' + name + '&dummy=' + this.cache_count++ });
 		this.reload(200);
@@ -422,7 +421,7 @@ Status.prototype.on_client_delete = function( name )
 Status.prototype.on_host_activate = function( name )
 {
 	console.log( "on_host_activate: " + name );
-	if (confirm("Activate certificate for: " + name + " ?. Please notice this end must be activated first" ))
+	if (confirm("Activate certificate for '" + name + "'? Please note this end must be activated first"))
 	{
 		jQuery.ajax({ url: '/json/command/host/activate/name=' + name + '&dummy=' + this.cache_count++ });
 	}
@@ -433,7 +432,7 @@ Status.prototype.on_host_activate = function( name )
 Status.prototype.on_host_active = function( cb, id, name )
 {
 	console.log( "on_host_active: " + name );
-	if (confirm("(De)Active for: " + name + " ?. Please notice this is NOT stored persistent, so it will be reset after next restart" ))
+	if (confirm("(De)activate for '" + name + "'? Please note this is NOT persistent, so it will be reset after next restart"))
 	{
 		jQuery.ajax({ url: '/json/command/host/active/name=' + name + '&id=' + id + '&check=' + cb.checked + '&dummy=' + this.cache_count++ });
 		this.reload(200);
@@ -444,7 +443,7 @@ Status.prototype.on_host_active = function( cb, id, name )
 Status.prototype.on_host_delete = function( name )
 {
 	console.log( "on_host_delete: " + name );
-	if (confirm("Delete certificate for: " + name + " ?" ))
+	if (confirm("Delete certificate for '" + name + "'?"))
 	{
 		jQuery.ajax({ url: '/json/command/host/delete/name=' + name + '&dummy=' + this.cache_count++ });
 	}
@@ -454,7 +453,7 @@ Status.prototype.on_host_delete = function( name )
 
 Status.prototype.on_stop = function( )
 {
-	if (confirm("Are you sure you want to stop the proxy application service ?" ))
+	if (confirm("Are you sure you want to stop the proxy application service?"))
 	{
 		jQuery.ajax({ url: '/json/command/stop/dummy=' + this.cache_count++ });
 	}
@@ -472,7 +471,7 @@ Status.prototype.on_filelog_active = function( cb )
 Status.prototype.on_configure = function( )
 {
 	console.log( "on_configure: " + name );
-	if (confirm("Are you sure you want to reload the configuration for the proxy application service ?" ))
+	if (confirm("Are you sure you want to reload the configuration for the proxy application service?"))
 	{
 		jQuery.ajax({ url: '/json/command/config/reload/dummy=' + this.cache_count++ });
 	}
@@ -482,18 +481,18 @@ Status.prototype.on_configure = function( )
 
 Status.prototype.on_toggle_log = function( )
 {
-	console.log( "on_toggle_log" );
-	var testdiv_outer = jQuery("#testdiv_outer");
-	if ( testdiv_outer.height() > 100 )
-	{
+   console.log( "on_toggle_log" );
+   var testdiv_outer = jQuery("#testdiv_outer");
+   if ( testdiv_outer.height() > 100 )
+   {
       $('#div_logfile').css('visibility', 'hidden');
-		testdiv_outer.height(0);
-	}
-	else
-	{
+      testdiv_outer.height(0);
+   }
+   else
+   {
       $('#div_logfile').css('visibility', 'visible');
-		testdiv_outer.height(200);
-	}
+      testdiv_outer.height(200);
+   }
 }
 
 
@@ -507,12 +506,12 @@ function on_status_timer()
 
 $(document).ready(function()
 {
-	status1 = new Status();
+   status1 = new Status();
 	
    $('#div_logfile').css('visibility', 'hidden');
-	console.log("Ready");
-	$.ajaxSetup({ cache: false });
-	console.dir(status1);
+   console.log("Ready");
+   $.ajaxSetup({ cache: false });
+   console.dir(status1);
 });
 
 
@@ -566,4 +565,3 @@ $(document).ready(function()
 
 <% end view %>
 <% end skin %>
-
