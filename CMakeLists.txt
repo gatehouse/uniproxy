@@ -2,6 +2,8 @@ cmake_minimum_required(VERSION 2.8)
 
 project(uniproxy_proj)
 
+OPTION(OPT_SYSTEMD "Use systemd on Linux" ON)
+
 IF (WIN32)
 	SET(VC_MAJOR "14" CACHE STRING "Visual Studio major version")
 	SET(VC_MINOR "1" CACHE STRING "Visual Studio minor version")
@@ -31,6 +33,9 @@ ELSE (WIN32)
 
 	ADD_DEFINITIONS(-g -std=c++17 -Wall -Wno-sign-compare)
 	ADD_DEFINITIONS(-Wl,--whole-archive -Wl,--no-while-archive, -Wno-deprecated-declarations)
+        IF (OPT_SYSTEMD)
+	   ADD_DEFINITIONS(-D_SYSTEMD_)
+        ENDIF()
 
 	include_directories(/opt/boost/1.73.0/include/ /opt/cppcms/1.2.1/include)
 
