@@ -140,8 +140,10 @@ void LocalHost::interrupt()
    try
    {
       DOUT(info() << "Enter");
+      this->mp_acceptor->cancel();
       if (int sock = get_socket(this->mp_acceptor, this->m_mutex_base); sock != 0)
       {
+         DOUT(info() << "Shutdown acceptor");
          shutdown(sock, boost::asio::socket_base::shutdown_both);
       }
       std::vector<int> socks;
