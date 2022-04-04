@@ -6,7 +6,7 @@ OPTION(OPT_SYSTEMD "Use systemd on Linux" ON)
 
 IF (WIN32)
 	SET(VC_MAJOR "14" CACHE STRING "Visual Studio major version")
-	SET(VC_MINOR "1" CACHE STRING "Visual Studio minor version")
+	SET(VC_MINOR "2" CACHE STRING "Visual Studio minor version")
 	SET(LANG c:/lang)
 ELSE()
 	SET(LANG $ENV{HOME}/lang)
