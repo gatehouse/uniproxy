@@ -118,7 +118,7 @@ void BaseClient::threadproc_activate(int index)
          boost::asio::ip::tcp::socket socket(io_service);
 
          this->dolog("Activate Performing remote connection to: " + epz );
-         boost::asio::sockect_connect(socket, io_service, this->remote_hostname(), this->m_activate_port);
+         boost::asio::socket_connect(socket, io_service, this->remote_hostname(), this->m_activate_port);
 
          RemoteEndpoint &ep = this->m_proxy_endpoints[index];
          this->dolog("Activate Attempting to perform certificate exchange with " + ep.m_name);

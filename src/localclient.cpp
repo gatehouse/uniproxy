@@ -403,7 +403,7 @@ void LocalHost::go_out(boost::asio::io_service &io_service)
       mylib::protect_pointer<ssl_socket> p2( this->mp_remote_socket, rem_socket, this->m_mutex_base );
 
       this->dolog(info() + "Connecting to remote host: " + this->remote_hostname() + ":" + mylib::to_string(this->remote_port()) );
-      boost::asio::sockect_connect(rem_socket.lowest_layer(), io_service, this->remote_hostname(), this->remote_port() );
+      boost::asio::socket_connect(rem_socket.lowest_layer(), io_service, this->remote_hostname(), this->remote_port() );
 
       this->dolog(info() + "Connected to remote host: " + this->remote_hostname() + ":" + mylib::to_string(this->remote_port()) + " Attempting SSL handshake" );
       DOUT(info() << "handles: " << rem_socket.next_layer().native_handle() << " / " << rem_socket.lowest_layer().native_handle() );

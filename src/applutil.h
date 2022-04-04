@@ -268,7 +268,7 @@ namespace asio {
 void socket_set_keepalive_to( ip::tcp::socket::lowest_layer_type &_socket, std::chrono::seconds _timeout );
 
 // _host may be either a host name, or a IPv4 or IPv6 address
-void sockect_connect( ip::tcp::socket::lowest_layer_type &_socket, boost::asio::io_service &_io_service, const std::string &_hostname, int _port );
+void socket_connect( ip::tcp::socket::lowest_layer_type &_socket, boost::asio::io_service &_io_service, const std::string &_hostname, int _port );
 
 // Check whether the socket is connected.
 bool is_connected( ip::tcp::socket::lowest_layer_type &_socket );

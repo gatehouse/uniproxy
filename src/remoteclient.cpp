@@ -271,7 +271,7 @@ int RemoteProxyClient::test_local_connection(const std::string& name, const std:
          try
          {
             this->dolog(this->dinfo() + "Test Host Performing local connection to: " + ep );
-            boost::asio::sockect_connect(this->m_local_socket, this->m_io_service, this->m_local_ep[proxy_index].m_hostname, this->m_local_ep[proxy_index].m_port);
+            boost::asio::socket_connect(this->m_local_socket, this->m_io_service, this->m_local_ep[proxy_index].m_hostname, this->m_local_ep[proxy_index].m_port);
             this->m_local_connected = true;
             break;
          }
@@ -383,7 +383,7 @@ void RemoteProxyClient::remote_threadproc()
          try
          {
             this->dolog(this->dinfo() + "Performing local connection to: " + ep );
-            boost::asio::sockect_connect( this->m_local_socket, this->m_io_service, this->m_local_ep[proxy_index].m_hostname, this->m_local_ep[proxy_index].m_port );
+            boost::asio::socket_connect( this->m_local_socket, this->m_io_service, this->m_local_ep[proxy_index].m_hostname, this->m_local_ep[proxy_index].m_port );
             this->m_local_connected = true;
             break;
          }
