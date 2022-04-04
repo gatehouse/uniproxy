@@ -12,7 +12,7 @@
 ; This version is released under the GNU General Public License with restrictions.
 ; See the doc/license.txt file.
 ;
-; Copyright (C) 2011-2013 by GateHouse A/S
+; Copyright (C) 2011-2022 by GateHouse A/S
 ; All Rights Reserved.
 ; http://www.gatehouse.dk
 ; mailto:gh@gatehouse.dk
@@ -38,8 +38,6 @@ Source: "../build64/uniproxy/RelWithDebInfo/uniproxy.exe"; DestDir: "{app}"
 
 ; For uniproxy
 Source: "third/vcredist_x64-vc14.exe"; Flags: dontcopy
-; For openssl
-; Source: "third/vcredist_x86-vc9.exe"; Flags: dontcopy
 Source: "third/openssl.exe"; DestDir: "{app}"
 Source: "third/openssl.cnf"; DestDir: "{app}"
 Source: "third/libeay32.dll"; DestDir: "{app}"
@@ -47,9 +45,7 @@ Source: "third/ssleay32.dll"; DestDir: "{app}"
 Source: "third/libcrypto-1_1-x64.dll"; DestDir: "{app}"
 Source: "third/libssl-1_1-x64.dll"; DestDir: "{app}"
 Source: "third/nssm.exe"; DestDir: "{app}"; Check: GetInstallService()
-;Source: "third/zlib.dll"; DestDir: "{app}"
 Source: "third/nc.exe"; DestDir: "{app}"
-;Source: "third/pcre.dll"; DestDir: "{app}"
 Source: "third/booster.dll"; DestDir: "{app}"
 Source: "third/cppcms.dll"; DestDir: "{app}"
 
@@ -137,4 +133,3 @@ function GetInstallService(): Boolean;
 begin
    Result := ServicePage.Values[0];
 end;
-
