@@ -174,6 +174,7 @@ public:
 
    bool SetupCertificatesClient(boost::asio::ip::tcp::socket& _remote_socket, const std::string& _connection_name);
    std::string SetupCertificatesServer(boost::asio::ip::tcp::socket& _remote_socket,
+                                       boost::asio::io_service& _io_service,
                                        const std::vector<std::string>& _connection_names);
 
    bool certificate_available( const std::string &_cert_name);

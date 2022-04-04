@@ -16,6 +16,7 @@
 // http://www.gatehouse.dk
 // mailto:gh@gatehouse.dk
 //====================================================================
+
 #ifndef _applutil_h
 #define _applutil_h
 
@@ -31,12 +32,6 @@
 #include <fstream>
 #include <chrono>
 #include <atomic>
-
-#ifdef _WIN32
-#undef _SYSTEMD_
-#else
-#define _SYSTEMD_ // Enable in Linux
-#endif
 
 #ifdef _SYSTEMD_
 #define DOUT( xx ) { std::lock_guard<std::mutex> lock(uniproxy::log_mutex); std::ostringstream oss; oss << mylib::time_stamp() << " id:"  << uniproxy::mask(std::this_thread::get_id()) << " " << uniproxy::filename(__FILE__) << " " << __FUNCTION__ << ":" << __LINE__ << " " << xx; proxy_log::do_log(oss.str()); }
@@ -277,7 +272,9 @@ bool get_certificate_issuer_subject( boost::asio::ssl::stream<boost::asio::ip::t
 
 // This function will perform a read_some on a blocking socket. Notice it uses a thread, so it is slow.
 // Notice this functionality is not supported by ASIO in itself.
-template<typename MutableBufferSequence> int socket_read_some_for( boost::asio::ip::tcp::socket &_socket, const MutableBufferSequence & _buffers, const boost::posix_time::time_duration & _duration )
+template<typename MutableBufferSequence> int socket_read_some_for(boost::asio::ip::tcp::socket& _socket,
+                                                                  const MutableBufferSequence& _buffers,
+                                                                  const boost::posix_time::time_duration& _duration)
 {
    int length = 0;
 #ifdef _MSC_VER
@@ -579,24 +576,6 @@ std::string readfile( const std::string &_filename );
 bool check_arg(int argc, char *argv[], char _short_argument, const char *_long_argument);
 bool check_arg( int argc, char *argv[], char _short_argument, const char *_long_argument, std::string &result );
 
-namespace std2
-{
-
-#ifdef _WIN32
-template<class T, class U> std::unique_ptr<T> make_unique(U&& u)
-{
-    return std::unique_ptr<T>(new T(std::forward<U>(u)));
-}
-#else
-template<typename T, typename... Args> std::unique_ptr<T> make_unique(Args&&... args)
-{
-    return std::unique_ptr<T>(new T(std::forward<Args>(args)...));
-}
-#endif
-
-} // namespace std2
-
-
 class process
 {
 public:
@@ -636,5 +615,38 @@ public:
 
    std::function<void()> m_func;
 };
+
+template <typename SyncReadStream, typename MutableBufferSequence>
+void read_with_timeout(SyncReadStream& s,
+                       boost::asio::io_service& _io_service,
+                       const MutableBufferSequence& buffers,
+                       const boost::asio::deadline_timer::duration_type& expiry_time)
+{
+   boost::optional<boost::system::error_code> timer_result;
+   boost::asio::deadline_timer timer(_io_service);
+   timer.expires_from_now(expiry_time);
+   timer.async_wait([&timer_result](const boost::system::error_code& error)
+                    {
+                       timer_result.reset(error);
+                    });
+   boost::optional<boost::system::error_code> read_result;
+   boost::asio::async_read(s, buffers,
+                           [&read_result](const boost::system::error_code& error, size_t size)
+                           {
+                              read_result.reset(error);
+                           });
+
+   if (_io_service.run_one())
+   {
+      if (read_result)
+      {
+         timer.cancel();
+      }
+      else if (timer_result)
+      {
+         s.cancel();
+      }
+   }
+}
 
 #endif

@@ -125,8 +125,9 @@ void BaseClient::threadproc_activate(int index)
          this->m_activate_stamp = boost::get_system_time(); // Reset to current time to avoid double attempts.
          std::vector<std::string> certnames;
          certnames.push_back(ep.m_name);
+         io_service.reset();
          if (global.SetupCertificatesClient(socket, certnames.front()) &&
-             !global.SetupCertificatesServer(socket, certnames).empty())
+             !global.SetupCertificatesServer(socket, io_service, certnames).empty())
          {
             this->dolog("Succeeded in exchanging certificates with " + certnames.front());
          }

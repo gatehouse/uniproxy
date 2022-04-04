@@ -11,11 +11,12 @@
 // This version is released under the GNU General Public License with restrictions.
 // See the doc/license.txt file.
 //
-// Copyright (C) 2011-2019 by GateHouse A/S
+// Copyright (C) 2011-2022 by GateHouse A/S
 // All Rights Reserved.
 // http://www.gatehouse.dk
 // mailto:gh@gatehouse.dk
 //====================================================================
+
 #include "proxy_global.h"
 #include "cppcms_util.h"
 #include <cppcms/view.h>
@@ -917,6 +918,7 @@ bool proxy_global::load_certificate_names( const std::string & _filename )
 
 
 std::string proxy_global::SetupCertificatesServer(boost::asio::ip::tcp::socket& _remote,
+                                                  boost::asio::io_service& _io_service,
                                                   const std::vector<std::string>& _certnames)
 {
    try
@@ -924,55 +926,14 @@ std::string proxy_global::SetupCertificatesServer(boost::asio::ip::tcp::socket& 
       DOUT(__FUNCTION__ << " certificate names: " << _certnames);
       ASSERTE( _certnames.size() > 0, uniproxy::error::connection_name_unknown, "" );
 
-      typedef boost::asio::detail::socket_option::integer<SOL_SOCKET, SO_RCVTIMEO> rcv_timeout_option;
-      _remote.set_option(rcv_timeout_option{ 2000 });
-
-      const auto start_time = boost::get_system_time();
       const int buffer_size = 4000;
       char buffer[buffer_size];
       memset(buffer, 0, buffer_size);
-      char* p = buffer;
-      int total_length = 0;
-      while (1)
-      {
-         try
-         {
-            char local_buffer[buffer_size];
-            int length = _remote.read_some(boost::asio::buffer(local_buffer, buffer_size));
-            if (length == 0)
-            {
-               break;
-            }
-            DOUT(info(_remote) << "Received: " << length << " bytes");
-            if (p + length >= buffer + buffer_size)
-            {
-               DOUT("Buffer overflow!");
-               break;
-            }
-            memcpy(p, local_buffer, length);
-            p += length;
-            total_length += length;
-         }
-         catch (std::exception&)
-         {
-            const auto elapsed = boost::get_system_time() - start_time;
-            if (total_length == 0)
-            {
-               if (elapsed > boost::posix_time::seconds(30))
-               {
-                  DOUT(info(_remote) << " Timeout (no data received");
-                  break;
-               }
-            }
-            else if (elapsed > boost::posix_time::seconds(5))
-            {
-               DOUT(info(_remote) << " Timeout (data received");
-               break;
-            }
-         }
-      }
-      DOUT(info(_remote) << "Received: " << total_length << " bytes");
-      ASSERTE(total_length > 0 && total_length < buffer_size, uniproxy::error::certificate_invalid, "received"); // NB!! Check the overflow situation.....
+      read_with_timeout(_remote, _io_service, boost::asio::buffer(buffer, buffer_size),
+                        boost::posix_time::seconds(5));
+      int length = strlen(buffer);
+
+      ASSERTE(length > 0 && length < buffer_size, uniproxy::error::certificate_invalid, "received"); // NB!! Check the overflow situation.....
       DOUT(info(_remote) << "SSL Possible Certificate received: " << buffer);
       std::vector<certificate_type> remote_certs, local_certs;
 
@@ -1006,7 +967,7 @@ std::string proxy_global::SetupCertificatesServer(boost::asio::ip::tcp::socket& 
       this->load_certificate_names( my_certs_name );
       return remote_name;
    }
-   catch( std::exception& exc )
+   catch (std::exception& exc)
    {
       DOUT(info(_remote) << __FUNCTION__ << " exception: " << exc.what());
       log().add(exc.what());
@@ -1015,11 +976,12 @@ std::string proxy_global::SetupCertificatesServer(boost::asio::ip::tcp::socket& 
 }
 
 
-bool proxy_global::SetupCertificatesClient(boost::asio::ip::tcp::socket &_remote, const std::string &_connection_name)
+bool proxy_global::SetupCertificatesClient(boost::asio::ip::tcp::socket& _remote, const std::string& _connection_name)
 {
    try
    {
       DOUT(info(_remote) << __FUNCTION__ << " connection name: " << _connection_name);
+      std::this_thread::sleep_for(std::chrono::seconds(1));
       const int buffer_size = 4000;
       char buffer[buffer_size];
       memset(buffer, 0, buffer_size);
@@ -1051,7 +1013,8 @@ bool proxy_global::certificate_available( const std::string &_cert_name)
 //-------------------------------------
 
 
-client_certificate_exchange::client_certificate_exchange( ) : mylib::thread( [](){} )
+client_certificate_exchange::client_certificate_exchange()
+   : mylib::thread([](){ })
 {
 }
 
@@ -1068,7 +1031,7 @@ void client_certificate_exchange::unlock()
 
 void client_certificate_exchange::start( const std::vector<LocalEndpoint> &eps )
 {
-   this->mylib::thread::start( [this,eps]( ){this->thread_proc(eps);} );
+   this->mylib::thread::start([this, eps](){ this->thread_proc(eps); });
 }
 
 
@@ -1159,7 +1122,7 @@ void client_certificate_exchange::thread_proc( const std::vector<LocalEndpoint> 
 
 
 activate_host::activate_host()
-:mylib::thread([this]{this->interrupt();})
+   : mylib::thread([this]{this->interrupt();})
 {
    
 }
@@ -1170,7 +1133,7 @@ void activate_host::start(int _port)
    if (!this->mylib::thread::is_running())
    {
       DOUT("Starting activation host on port: " << _port);
-      this->mylib::thread::start([this,_port]{this->threadproc(_port);});
+      this->mylib::thread::start([this, _port]{this->threadproc(_port);});
    }
    else
    {
@@ -1189,6 +1152,7 @@ void activate_host::start(int _port)
 
 void activate_host::interrupt()
 {
+   DOUT(__FUNCTION__);
    if (int sock = get_socket(this->mp_acceptor, this->m_mutex_activate); sock != 0)
    {
       // Do we need a cancel??
@@ -1247,7 +1211,8 @@ void activate_host::threadproc(int _port)
                }
             }
          }
-         std::string certname = global.SetupCertificatesServer(socket, activate_names);
+         io_service.reset();
+         std::string certname = global.SetupCertificatesServer(socket, io_service, activate_names);
          if (!certname.empty() && global.SetupCertificatesClient(socket, certname))
          {
             DOUT("Succeeded in exchanging certificates for " << certname);
