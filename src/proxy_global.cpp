@@ -934,7 +934,7 @@ std::string proxy_global::SetupCertificatesServer(boost::asio::ip::tcp::socket& 
       int length = strlen(buffer);
 
       ASSERTE(length > 0 && length < buffer_size, uniproxy::error::certificate_invalid, "received"); // NB!! Check the overflow situation.....
-      DOUT(info(_remote) << "SSL Possible Certificate received: " << buffer);
+      DOUT(info(_remote) << "SSL Possible Certificate received (length " << length << "): " << buffer);
       std::vector<certificate_type> remote_certs, local_certs;
 
       ASSERTE(load_certificates_string( buffer, remote_certs ) && remote_certs.size() == 1, uniproxy::error::certificate_invalid, "received");
