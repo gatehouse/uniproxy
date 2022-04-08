@@ -11,11 +11,11 @@ fi
 
 version=`sed -n -e 's/const.*version.*"\(.*\)";/\1/p' $1/release.cpp`
 
-ln -s $1/deb/postinstall-pak
-ln -s $1/deb/preinstall-pak
-ln -s $1/deb/preremove-pak
-ln -s $1/deb/postremove-pak
-ln -s $1/deb/description-pak
+ln -s $1/deb-lite/postinstall-pak
+ln -s $1/deb-lite/preinstall-pak
+ln -s $1/deb-lite/preremove-pak
+ln -s $1/deb-lite/postremove-pak
+ln -s $1/deb-lite/description-pak
 touch install_manifest.txt
 
 make
