@@ -1,0 +1,5 @@
+#!/bin/bash
+
+rootdir=/var/lib/uniproxy
+
+exit 0

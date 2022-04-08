@@ -1,0 +1,16 @@
+#!/bin/bash
+#
+#
+
+install_prefix=/usr/local
+rootdir=/var/lib/uniproxy
+
+# Create user and home
+useradd -d ${rootdir} -g users -s /bin/bash -m --system uniproxy
+
+if [ ! -f  ${rootdir}/script/jquery.js ]; then
+  mkdir -p ${rootdir}/script/
+  ln -s ${install_prefix}/share/doc/uniproxy/jquery.js ${rootdir}/script/jquery.js
+fi
+
+exit 0
