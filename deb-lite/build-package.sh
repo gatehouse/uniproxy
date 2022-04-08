@@ -21,6 +21,6 @@ touch install_manifest.txt
 make
 
 #run this with sudo. It will remove some of the annoying side effects afterwards.
-sudo checkinstall --install=no --pkgversion=${version} --pkgrelease=${BUILD_NUMBER} --pkglicense=GPL --pkgname=uniproxy --maintainer="Poul Bondo \<pba@gatehouse.dk\>" --provides=uniproxy --requires="openssl" --nodoc --exclude=/home  --backup=no
+sudo checkinstall --install=no --pkgversion=${version} --pkgrelease=${BUILD_NUMBER} --pkglicense=GPL --pkgname=uniproxy-lite --maintainer="Torsten Martinsen \<tma@gatehouse.com\>" --provides=uniproxy --requires="openssl" --nodoc --exclude=/home  --backup=no
 
 rm postinstall-pak  postremove-pak  preinstall-pak  preremove-pak description-pak
