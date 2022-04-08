@@ -11,11 +11,12 @@
 // This version is released under the GNU General Public License with restrictions.
 // See the doc/license.txt file.
 //
-// Copyright (C) 2011-2013 by GateHouse A/S
+// Copyright (C) 2011-2022 by GateHouse A/S
 // All Rights Reserved.
 // http://www.gatehouse.dk
 // mailto:gh@gatehouse.dk
 //====================================================================
+
 #include "applutil.h"
 #include "cppcms_util.h"
 #include <fstream>
@@ -264,7 +265,7 @@ void socket_set_keepalive_to( ip::tcp::socket::lowest_layer_type &_socket, std::
 }
 
 
-void sockect_connect( ip::tcp::socket::lowest_layer_type &_socket, boost::asio::io_service &_io_service, const std::string &_host, int _port )
+void socket_connect( ip::tcp::socket::lowest_layer_type &_socket, boost::asio::io_service &_io_service, const std::string &_host, int _port )
 {
    // The following section uses a DNS resolver which should be valid for both IPv4 and IPv6
    boost::asio::ip::tcp::resolver resolver(_io_service);

@@ -57,7 +57,6 @@ cppcms::service *signal::m_psrv = NULL;
 
 // I didn't want to bother having a file for a single line of code. The following line does not really belong here.
 std::vector<PluginHandler*> *PluginHandler::m_plugins = NULL;
-class cppcms::form c;
 
 PGHPFilter m_PGHPFilter;
 
@@ -66,23 +65,23 @@ PGHPFilter m_PGHPFilter;
 
 proxy_app::proxy_app(cppcms::service &srv) : cppcms::application(srv), timer_(srv.get_io_service())
 {
-   dispatcher().assign("^/command/client/activate/name=(.*)&id=(.*)&dummy=(.*)$",&proxy_app::client_activate,this,1,2);
-   dispatcher().assign("^/command/client/active/name=(.*)&id=(.*)&check=(.*)&dummy=(.*)$",&proxy_app::client_active,this,1,2,3);
-   dispatcher().assign("^/command/host/activate/name=(.*)&dummy=(.*)$",&proxy_app::host_activate,this,1);
-   dispatcher().assign("^/command/host/active/name=(.*)&id=(.*)&check=(.*)&dummy=(.*)$",&proxy_app::host_active,this,1,2,3);
-   dispatcher().assign("^/command/host/test/name=(.*)&dummy=(.*)$",&proxy_app::host_test,this,1);
-   dispatcher().assign("^/command/client/delete/name=(.*)&dummy=(.*)$",&proxy_app::certificate_delete,this,1);
-   dispatcher().assign("^/command/host/delete/name=(.*)&dummy=(.*)$",&proxy_app::certificate_delete,this,1);
-   dispatcher().assign("^/command/stop/(.*)$",&proxy_app::shutdown,this);
-   dispatcher().assign("^/command/config/upload/(.*)$",&proxy_app::config_upload,this);
-   dispatcher().assign("^/command/config/reload/(.*)$",&proxy_app::config_reload,this);
-   dispatcher().assign("^/command/logfile/active=(.*)$",&proxy_app::log_file,this,1);
-   dispatcher().assign("^/script/(.*)$",&proxy_app::script,this,1);
-   dispatcher().assign("^/status/(.*)$",&proxy_app::status_get,this);
-   dispatcher().assign("^/logger/(.*)$",&proxy_app::logger_get,this);
-   dispatcher().assign("^/command/certificate/get/(.*)$",&proxy_app::get_certificates,this,1);
-   dispatcher().assign("^/command/certificate/public/(.*)$",&proxy_app::get_public_certificate,this,1);
-   dispatcher().assign("^/$",&proxy_app::index,this);
+   dispatcher().assign("^/command/client/activate/name=(.*)&id=(.*)&dummy=(.*)$", &proxy_app::client_activate, this, 1, 2);
+   dispatcher().assign("^/command/client/active/name=(.*)&id=(.*)&check=(.*)&dummy=(.*)$", &proxy_app::client_active, this, 1, 2, 3);
+   dispatcher().assign("^/command/host/activate/name=(.*)&dummy=(.*)$", &proxy_app::host_activate, this, 1);
+   dispatcher().assign("^/command/host/active/name=(.*)&id=(.*)&check=(.*)&dummy=(.*)$", &proxy_app::host_active, this, 1, 2, 3);
+   dispatcher().assign("^/command/host/test/name=(.*)&dummy=(.*)$", &proxy_app::host_test, this, 1);
+   dispatcher().assign("^/command/client/delete/name=(.*)&dummy=(.*)$", &proxy_app::certificate_delete, this, 1);
+   dispatcher().assign("^/command/host/delete/name=(.*)&dummy=(.*)$", &proxy_app::certificate_delete, this, 1);
+   dispatcher().assign("^/command/stop/(.*)$", &proxy_app::shutdown, this);
+   dispatcher().assign("^/command/config/upload/(.*)$", &proxy_app::config_upload, this);
+   dispatcher().assign("^/command/config/reload/(.*)$", &proxy_app::config_reload, this);
+   dispatcher().assign("^/command/logfile/active=(.*)$", &proxy_app::log_file, this, 1);
+   dispatcher().assign("^/script/(.*)$", &proxy_app::script, this, 1);
+   dispatcher().assign("^/status/(.*)$", &proxy_app::status_get, this);
+   dispatcher().assign("^/logger/(.*)$", &proxy_app::logger_get, this);
+   dispatcher().assign("^/command/certificate/get/(.*)$", &proxy_app::get_certificates, this, 1);
+   dispatcher().assign("^/command/certificate/public/(.*)$", &proxy_app::get_public_certificate, this, 1);
+   dispatcher().assign("^/$", &proxy_app::index, this);
 }
 
 
@@ -333,7 +332,7 @@ void proxy_app::config_upload()
                log().add("Updated configuration without restart, now starting all connections");
                global.lock();
             }
-            catch(std::exception exc)
+            catch (std::exception&)
             {
                log().add("Configuration update failed to warrant a restart. All connections will be closed");
                throw mylib::reload_exception();
@@ -388,22 +387,22 @@ void proxy_app::setup_config( cppcms::json::value &settings_object )
       settings_object["http"]["script"]="/json";
    }
    #ifdef _WIN32
-   std::string coockie_path = getenv("TEMP");
-   if ( !coockie_path.length() )
+   std::string cookie_path = getenv("TEMP");
+   if ( !cookie_path.length() )
    {
-      coockie_path = "c:/temp";
+      cookie_path = "c:/temp";
    }
    #else
-   std::string coockie_path = "/tmp";
+   std::string cookie_path = "/tmp";
    #endif
-   std::string coockie = "uniproxy" + mylib::to_string(global.m_web_port);
+   std::string cookie = "uniproxy" + mylib::to_string(global.m_web_port);
    settings_object["service"]["api"]="http";
    settings_object["service"]["port"]= global.m_web_port;
    settings_object["service"]["ip"]= global.m_ip4_mask;
    settings_object["session"]["location"] = "client";
-   settings_object["session"]["cookies"]["prefix"] = coockie;
+   settings_object["session"]["cookies"]["prefix"] = cookie;
    settings_object["session"]["server"]["storage"] = "files"; //memory";
-   settings_object["session"]["server"]["dir"] = coockie_path + "/uniproxy_" + boost::posix_time::to_iso_string(boost::get_system_time().time_of_day() ).substr(0,6);
+   settings_object["session"]["server"]["dir"] = cookie_path + "/uniproxy_" + boost::posix_time::to_iso_string(boost::get_system_time().time_of_day() ).substr(0,6);
    settings_object["session"]["client"]["encryptor"] = "hmac";
    settings_object["session"]["client"]["key"] = "29b6e071ad5870228c6a2115d88d3b2e";
    settings_object["service"]["worker_threads"] = 5; // Default = 5 * #CPU

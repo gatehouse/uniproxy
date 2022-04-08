@@ -133,7 +133,7 @@ void ProviderClient::connect_remote(boost::asio::io_service &io_service, ssl_soc
          try
          {
             this->dolog("Performing remote connection to: " + ep );
-            boost::asio::sockect_connect( remote_socket.lowest_layer(), io_service, remote_hostname(), this->remote_port());
+            boost::asio::socket_connect( remote_socket.lowest_layer(), io_service, remote_hostname(), this->remote_port());
             break;
          }
          catch( std::exception &exc )
@@ -269,7 +269,7 @@ void ProviderClient::threadproc_reader()
             try
             {
                this->dolog("Provider connecting to local: " + ep );
-               boost::asio::sockect_connect( local_socket, io_service, this->m_local_endpoints[index].m_hostname, this->m_local_endpoints[index].m_port );
+               boost::asio::socket_connect( local_socket, io_service, this->m_local_endpoints[index].m_hostname, this->m_local_endpoints[index].m_port );
                this->m_local_connected_index = index;
                break;
             }

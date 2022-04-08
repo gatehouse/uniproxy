@@ -23,6 +23,8 @@
 #include "proxy_global.h"
 #include <random>
 
+using boost::asio::deadline_timer;
+
 static int static_remote_count = 0;
 
 
@@ -76,25 +78,12 @@ RemoteProxyClient::~RemoteProxyClient()
 
 std::string RemoteProxyClient::dinfo()
 {
-   std::string cached;
    boost::system::error_code ec;
    boost::asio::ip::tcp::endpoint ep_local = this->m_local_socket.lowest_layer().remote_endpoint(ec);
-   if (!ec)
-   {
-      this->m_local_cache = ep_local;
-   }
    boost::asio::ip::tcp::endpoint ep_remote = this->m_remote_socket.lowest_layer().remote_endpoint(ec);
-   if (!ec)
-   {
-      this->m_remote_cache = ep_remote;
-   }
-   else
-   {
-      cached = " Cached.";
-   }
 
    std::ostringstream oss;
-   oss << this->m_remote_cache << " => " << this->m_local_cache << cached << " ";
+   oss << ep_remote << " => " << ep_local << " ";
    return oss.str();
 }
 
@@ -158,10 +147,10 @@ bool RemoteProxyClient::is_active()
 void RemoteProxyClient::stop()
 {
    // The threads are stopped and joined.
-   this->m_local_thread.stop();
-   this->m_remote_thread.stop();
    if (this->m_stopped == std::chrono::system_clock::time_point())
    {
+      this->m_local_thread.stop();
+      this->m_remote_thread.stop();
       this->m_stopped = std::chrono::system_clock::now();
    }
 }
@@ -282,7 +271,7 @@ int RemoteProxyClient::test_local_connection(const std::string& name, const std:
          try
          {
             this->dolog(this->dinfo() + "Test Host Performing local connection to: " + ep );
-            boost::asio::sockect_connect(this->m_local_socket, this->m_io_service, this->m_local_ep[proxy_index].m_hostname, this->m_local_ep[proxy_index].m_port);
+            boost::asio::socket_connect(this->m_local_socket, this->m_io_service, this->m_local_ep[proxy_index].m_hostname, this->m_local_ep[proxy_index].m_port);
             this->m_local_connected = true;
             break;
          }
@@ -394,7 +383,7 @@ void RemoteProxyClient::remote_threadproc()
          try
          {
             this->dolog(this->dinfo() + "Performing local connection to: " + ep );
-            boost::asio::sockect_connect( this->m_local_socket, this->m_io_service, this->m_local_ep[proxy_index].m_hostname, this->m_local_ep[proxy_index].m_port );
+            boost::asio::socket_connect( this->m_local_socket, this->m_io_service, this->m_local_ep[proxy_index].m_hostname, this->m_local_ep[proxy_index].m_port );
             this->m_local_connected = true;
             break;
          }
@@ -470,7 +459,9 @@ void RemoteProxyClient::remote_threadproc()
       // NB!! Notice we cannot use the mutex here because the shutdown operation may linger.
       boost::system::error_code ec;
       DOUT("synced shutdown remote socket enter");
-      this->m_remote_socket.shutdown(ec);
+      //this->m_remote_socket.shutdown(ec); // This literally requires the client end to be available otherwise we are stuck here forever, e.g. docker pause
+      this->m_remote_socket.lowest_layer().shutdown(boost::asio::ip::tcp::socket::shutdown_both, ec);
+      DOUT("synced shutdown remote socket close");
       this->m_remote_socket.lowest_layer().close(ec);
       DOUT("synced shutdown remote socket done " << ec);
    }
@@ -547,11 +538,10 @@ void RemoteProxyHost::stop_by_name(const std::string& certname)
    // Clean up the current client list and remove any non active clients.
    for (auto iter2 = this->m_clients.begin(); iter2 != this->m_clients.end(); )
    {
-      RemoteProxyClient *pHelp = *iter2;
-      if (pHelp->m_endpoint.m_name == certname)
+      if ((*iter2)->m_endpoint.m_name == certname)
       {
          DOUT(dinfo() << "Found and stopping host connection: " << certname);
-         pHelp->stop();
+         (*iter2)->stop();
          iter2++;
          DOUT(dinfo() << "Done stopping host connection: " << certname);
       }
@@ -606,6 +596,7 @@ void RemoteProxyHost::lock()
 
 void RemoteProxyHost::unlock()
 {
+   DOUT(this->dinfo() << "unlock");
    boost::system::error_code ec;
    this->m_acceptor.cancel(ec);
    shutdown(this->m_acceptor.native_handle(), boost::asio::socket_base::shutdown_both);
@@ -620,13 +611,26 @@ void RemoteProxyHost::threadproc()
       this->dolog(this->dinfo() + std::string("Waiting for remote connection on port: ") + mylib::to_string(this->m_local_port));
       this->m_acceptor.listen();
 
-      RemoteProxyClient* new_session = new RemoteProxyClient(m_io_service, m_context, *this);
-      this->m_acceptor.async_accept(new_session->socket(),boost::bind(&RemoteProxyHost::handle_accept, this, new_session,boost::asio::placeholders::error));
+      RemoteProxyClient::pointer new_session = RemoteProxyClient::create(m_io_service, m_context, *this);
+      this->m_acceptor.async_accept(new_session->socket(),
+         boost::bind(&RemoteProxyHost::handle_accept, this, new_session, boost::asio::placeholders::error));
+
+      scope_exit se([this]
+      {
+         DOUT(this->dinfo() << "scope_exit start");
+         this->unlock();
+         DOUT(this->dinfo() << "scope_exit dont");
+      });
 
       for ( ; this->m_thread.check_run(); )
       {
          try
          {
+            boost::asio::deadline_timer deadline(this->m_io_service);
+            mylib::protect_pointer<boost::asio::deadline_timer> p_deadline(this->m_pdeadline, deadline, this->m_mutex);
+            deadline.async_wait(boost::bind(&RemoteProxyHost::check_deadline, this, boost::asio::placeholders::error));
+            deadline.expires_from_now(boost::posix_time::seconds(5));
+
             this->m_io_service.run();
          }
          catch( std::exception &exc )
@@ -676,55 +680,78 @@ int RemoteProxyHost::test_local_connection(const std::string& name)
    return test.test_local_connection(name, this->m_local_ep);
 }
 
+void RemoteProxyHost::check_deadline(const boost::system::error_code& error)
+{
+   ASSERTE(this->m_pdeadline != nullptr, boost::system::errc::timed_out, "deadline timer out of scope");
+   if (error == boost::asio::error::operation_aborted) // This will happen on every read / write that will reset the timer.
+   {
+      this->m_pdeadline->async_wait(boost::bind(&RemoteProxyHost::check_deadline, this, boost::asio::placeholders::error));
+      return;
+   }
+   bool expired = deadline_timer::traits_type::now() >= this->m_pdeadline->expires_at();
+   //DOUT("Deadline timer: " << expired);
+   if (expired)
+   {
+      this->m_pdeadline->expires_from_now(boost::posix_time::seconds(3));;
+      this->m_pdeadline->async_wait(boost::bind(&RemoteProxyHost::check_deadline, this, boost::asio::placeholders::error));
+
+      int idle = 0;
+      int removed = 0;
+      int total = 0;
+      std::lock_guard<std::mutex> l(this->m_mutex);
+      total = this->m_clients.size();
+      // Clean up the current client list and remove any non active clients.
+      for ( auto iter2 = this->m_clients.begin(); iter2 != this->m_clients.end(); )
+      {
+         if (!(*iter2)->is_active())
+         {
+            (*iter2)->stop();
+            if (std::chrono::system_clock::now() > (*iter2)->stopped() + std::chrono::seconds(2))
+            {
+               iter2 = this->m_clients.erase( iter2 );
+               removed++;
+            }
+            else
+            {
+               idle++;
+               iter2++;
+            }
+         }
+         else
+         {
+            // NB!! We should not allow an additional one here, so we should actually return from the function here ??
+            iter2++;
+         }
+      }
+      if (idle > 0 || removed > 0)
+      {
+         DOUT(this->dinfo() << "Idle count: " << idle << " removed " << removed << " of " << total);
+      }
+   }
+}
 
 // A new connection from a remote proxy is accepted
 //
-void RemoteProxyHost::handle_accept(RemoteProxyClient* new_session, const boost::system::error_code& error)
+void RemoteProxyHost::handle_accept(RemoteProxyClient::pointer new_session, const boost::system::error_code& error)
 {
    try
    {
       DOUT(this->dinfo() << " error state " << error);
       if (!error)
       {
-         std::lock_guard<std::mutex> l(this->m_mutex);
-         // Clean up the current client list and remove any non active clients.
-         for ( auto iter2 = this->m_clients.begin(); iter2 != this->m_clients.end(); )
-         {
-            RemoteProxyClient *pHelp = *iter2;
-            if (pHelp->stopped() == std::chrono::system_clock::time_point())
-            {
-               pHelp->stop();
-            }
-            if (pHelp->is_stopped())
-            {
-               iter2 = this->m_clients.erase( iter2 );
-               delete pHelp; // This may cause a timer based cleanup function in asio to access after delete.
-            }
-            else
-            {
-               // NB!! We should not allow an additional one here, so we should actually return from the function here ??
-               iter2++;
-            }
-         }
-         DOUT(this->dinfo());
          load_verify_file(this->m_context, my_certs_name);
          this->m_clients.push_back( new_session );
          new_session->start( this->m_local_ep );
 
-         mylib::msleep(1000);
-         DOUT(this->dinfo() << "Trying to reload verify file");
-         load_verify_file(this->m_context, my_certs_name);
-         // This call is not multithread safe. load_certificate_names( my_certs_name );
-
          // We create the next one, which is then waiting for a connection.
-         new_session = new RemoteProxyClient(m_io_service, m_context,*this);
+         new_session = RemoteProxyClient::create(m_io_service, m_context,*this);
          m_acceptor.async_accept(new_session->socket(),boost::bind(&RemoteProxyHost::handle_accept, this, new_session,boost::asio::placeholders::error));
          return;
       }
       else
       {
          DOUT(this->dinfo() << "failed to accept, deleting session");
-         delete new_session;
+         new_session.reset();
       }
    }
    catch( std::exception &exc )

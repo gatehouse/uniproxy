@@ -8,6 +8,8 @@
 div.connection_ok{ background-color: green; }
 div.connection_warning{ background-color: yellow; }
 div.connection_error{ background-color: red; }
+body { font:80% Verdana,Tahoma,Arial,sans-serif; }
+h1, h2, h3, h4 {  font-family: "Trebuchet MS",Georgia,"Times New Roman",serif; }
 </style>
 <% end template %>
 
@@ -26,12 +28,12 @@ div.connection_error{ background-color: red; }
 var status1 = null;
 
 
-function timestamp_to_string( ts2 )
+function timestamp_to_string()
 {
-	var ts = new Date();
-	ts = ts2;
-	var sz = " " + ts.getUTCFullYear() + "-" + (ts.getUTCMonth() + 1) + "-" + ts.getUTCDate() + " " + ts.getUTCHours() + ":" + ts.getUTCMinutes() + ":" + ts.getUTCSeconds();
-	return sz
+   var ts = new Date();
+   ts.setMilliseconds(0);
+   var sz = ts.toISOString().replace("T", " ").replace("Z", "").replace(".000", "");
+   return sz
 }
 
 
@@ -47,7 +49,6 @@ var Status = function()
 
 Status.prototype.do_add_lines = function( text )
 {
-
 	var something_was_added = 0;
 	var testdiv_outer = jQuery("#testdiv_outer");
 	var testdiv = jQuery("#testdiv_outer > .testdiv_inner");
@@ -345,7 +346,6 @@ Status.prototype.on_status_update1 = function( data )
 	sz_html += "</table>";
 	$("#version").html( (json_data.version) ? (json_data.version) : "&nbsp;" );
 	$("#hosts").html( sz_html );
-
 	$("#own_name").html( (json_data.global.name) ? (json_data.global.name) : "&nbsp;" );
 }
 
@@ -353,7 +353,7 @@ Status.prototype.on_status_update1 = function( data )
 Status.prototype.do_get_update = function( )
 {
 	// Make sure we keep running, even if there are problems.
-	this.reload(5000);
+	this.reload(1000);
 	try
 	{
 		var that = this;
@@ -363,14 +363,14 @@ Status.prototype.do_get_update = function( )
 			success: function(data)
 			{
 				
-				$("#status").html("Running" + timestamp_to_string( new Date() ) + " UTC" );
+				$("#status").html("Running " + timestamp_to_string() + " UTC" );
 				$("#status").removeClass();
 				that.on_status_update1( data );
 				that.do_get_log();
 			},
 			error: function()
 			{
-				$("#status").html("No connection to proxy" + timestamp_to_string( new Date() ) + " UTC" );
+				$("#status").html("No connection to proxy " + timestamp_to_string() + " UTC" );
 				$("#status").removeClass().addClass('connection_error');
 				$("#clients").html("");
 				$("#hosts").html("");
@@ -387,7 +387,7 @@ Status.prototype.do_get_update = function( )
 Status.prototype.on_client_activate = function( id, name )
 {
 	console.log( "on_client_activate: " + name );
-	if (confirm("Activate certificate for: " + name + " ?. Please notice the host at the other end must be activated first" ))
+	if (confirm("Activate certificate for '" + name + "'? Please note the host at the other end must be activated first" ))
 	{
 		jQuery.ajax({ url: '/json/command/client/activate/name=' + name + '&id=' + id + '&dummy=' + this.cache_count++ });
 		this.reload(200);
@@ -398,7 +398,7 @@ Status.prototype.on_client_activate = function( id, name )
 Status.prototype.on_client_active = function( cb, id, name )
 {
 	console.log( "on_client_active: " + name );
-	if (confirm("(De)Active for: " + name + " ?. Please notice this is NOT stored persistent, so it will be reset after next restart" ))
+	if (confirm("(De)activate for '" + name + "'? Please note this is NOT persistent, so it will be reset after next restart"))
 	{
 		jQuery.ajax({ url: '/json/command/client/active/name=' + name + '&id=' + id + '&check=' + cb.checked + '&dummy=' + this.cache_count++ });
 		this.reload(200);
@@ -411,7 +411,7 @@ Status.prototype.on_client_active = function( cb, id, name )
 Status.prototype.on_client_delete = function( name )
 {
 	console.log( "on_client_delete: " + name );
-	if (confirm("Delete certificate for: " + name + " ?" ))
+	if (confirm("Delete certificate for '" + name + "'?"))
 	{
 		jQuery.ajax({ url: '/json/command/client/delete/name=' + name + '&dummy=' + this.cache_count++ });
 		this.reload(200);
@@ -422,7 +422,7 @@ Status.prototype.on_client_delete = function( name )
 Status.prototype.on_host_activate = function( name )
 {
 	console.log( "on_host_activate: " + name );
-	if (confirm("Activate certificate for: " + name + " ?. Please notice this end must be activated first" ))
+	if (confirm("Activate certificate for '" + name + "'? Please note this end must be activated first"))
 	{
 		jQuery.ajax({ url: '/json/command/host/activate/name=' + name + '&dummy=' + this.cache_count++ });
 	}
@@ -433,7 +433,7 @@ Status.prototype.on_host_activate = function( name )
 Status.prototype.on_host_active = function( cb, id, name )
 {
 	console.log( "on_host_active: " + name );
-	if (confirm("(De)Active for: " + name + " ?. Please notice this is NOT stored persistent, so it will be reset after next restart" ))
+	if (confirm("(De)activate for '" + name + "'? Please note this is NOT persistent, so it will be reset after next restart"))
 	{
 		jQuery.ajax({ url: '/json/command/host/active/name=' + name + '&id=' + id + '&check=' + cb.checked + '&dummy=' + this.cache_count++ });
 		this.reload(200);
@@ -444,7 +444,7 @@ Status.prototype.on_host_active = function( cb, id, name )
 Status.prototype.on_host_delete = function( name )
 {
 	console.log( "on_host_delete: " + name );
-	if (confirm("Delete certificate for: " + name + " ?" ))
+	if (confirm("Delete certificate for '" + name + "'?"))
 	{
 		jQuery.ajax({ url: '/json/command/host/delete/name=' + name + '&dummy=' + this.cache_count++ });
 	}
@@ -454,7 +454,7 @@ Status.prototype.on_host_delete = function( name )
 
 Status.prototype.on_stop = function( )
 {
-	if (confirm("Are you sure you want to stop the proxy application service ?" ))
+	if (confirm("Are you sure you want to stop the proxy application service?"))
 	{
 		jQuery.ajax({ url: '/json/command/stop/dummy=' + this.cache_count++ });
 	}
@@ -472,7 +472,7 @@ Status.prototype.on_filelog_active = function( cb )
 Status.prototype.on_configure = function( )
 {
 	console.log( "on_configure: " + name );
-	if (confirm("Are you sure you want to reload the configuration for the proxy application service ?" ))
+	if (confirm("Are you sure you want to reload the configuration for the proxy application service?"))
 	{
 		jQuery.ajax({ url: '/json/command/config/reload/dummy=' + this.cache_count++ });
 	}
@@ -482,18 +482,18 @@ Status.prototype.on_configure = function( )
 
 Status.prototype.on_toggle_log = function( )
 {
-	console.log( "on_toggle_log" );
-	var testdiv_outer = jQuery("#testdiv_outer");
-	if ( testdiv_outer.height() > 100 )
-	{
+   console.log( "on_toggle_log" );
+   var testdiv_outer = jQuery("#testdiv_outer");
+   if ( testdiv_outer.height() > 100 )
+   {
       $('#div_logfile').css('visibility', 'hidden');
-		testdiv_outer.height(0);
-	}
-	else
-	{
+      testdiv_outer.height(0);
+   }
+   else
+   {
       $('#div_logfile').css('visibility', 'visible');
-		testdiv_outer.height(200);
-	}
+      testdiv_outer.height(200);
+   }
 }
 
 
@@ -507,12 +507,12 @@ function on_status_timer()
 
 $(document).ready(function()
 {
-	status1 = new Status();
+   status1 = new Status();
 	
    $('#div_logfile').css('visibility', 'hidden');
-	console.log("Ready");
-	$.ajaxSetup({ cache: false });
-	console.dir(status1);
+   console.log("Ready");
+   $.ajaxSetup({ cache: false });
+   console.dir(status1);
 });
 
 
@@ -530,9 +530,7 @@ $(document).ready(function()
 
 
 <% template mainview() %>
-<table>
-<tr><td><h2>UniProxy(</h2></td><td><h2> <div id="own_name"></div> </h2></td><td><h2>)</h2></td></tr>
-</table>
+<h2>UniProxy (<span id="own_name"></span>)</h2>
 <div id="clients" data-role="collapsible" data-collapsed="false" ></div>
 <div id="providers"></div>
 <div id="hosts"></div>
@@ -566,4 +564,3 @@ $(document).ready(function()
 
 <% end view %>
 <% end skin %>
-

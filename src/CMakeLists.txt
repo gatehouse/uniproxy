@@ -4,13 +4,12 @@
 #
 project(uniproxy)
 
-# This command assemble the cppcms templates
+# This command assembles the cppcms templates
 IF (WIN32)
 
 add_custom_command(
   OUTPUT views.cpp
-  COMMAND python "${LANG}/cppcms-1.2.1/bin/cppcms_tmpl_cc" ../../webserver/master.tmpl ../../webserver/view_config.tmpl ../../webserver/view_status.tmpl -o views.cpp
-  #COMMAND cppcms_tmpl_cc.py ../webserver/master.tmpl ../webserver/view_config.tmpl ../webserver/view_status.tmpl -o views.cpp
+  COMMAND py -2 "${LANG}/cppcms-1.2.1/bin/cppcms_tmpl_cc" "${CMAKE_CURRENT_SOURCE_DIR}/../webserver/master.tmpl" "${CMAKE_CURRENT_SOURCE_DIR}/../webserver/view_config.tmpl" "${CMAKE_CURRENT_SOURCE_DIR}/../webserver/view_status.tmpl" -o views.cpp
   DEPENDS ../webserver/master.tmpl ../webserver/view_config.tmpl ../webserver/view_status.tmpl
   WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
   COMMENT "Precompiling views"
@@ -21,7 +20,7 @@ ELSE (WIN32)
 
 add_custom_command(
   OUTPUT views.cpp
-  COMMAND /opt/cppcms/1.2.1/bin/cppcms_tmpl_cc ../../webserver/master.tmpl ../../webserver/view_config.tmpl ../../webserver/view_status.tmpl -o views.cpp
+  COMMAND /opt/cppcms/1.2.1/bin/cppcms_tmpl_cc "${CMAKE_CURRENT_SOURCE_DIR}/../webserver/master.tmpl" "${CMAKE_CURRENT_SOURCE_DIR}/../webserver/view_config.tmpl" "${CMAKE_CURRENT_SOURCE_DIR}/../webserver/view_status.tmpl" -o views.cpp
   DEPENDS ../webserver/master.tmpl ../webserver/view_config.tmpl ../webserver/view_status.tmpl
   WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
   COMMENT "Precompiling views"
@@ -78,7 +77,7 @@ IF (WIN32)
 
 	add_executable( ${PROJECT_NAME} ${CPP_SOURCE})
 
-	target_link_libraries (${PROJECT_NAME} gatehouse cppcms booster libcrypto libssl)
+	target_link_libraries (${PROJECT_NAME} gatehouse ${CPPCMS_LIBRARY} libcrypto libssl)
 
 ELSE()
 

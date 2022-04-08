@@ -11,11 +11,12 @@
 // This version is released under the GNU General Public License with restrictions.
 // See the doc/license.txt file.
 //
-// Copyright (C) 2011-2019 by GateHouse A/S
+// Copyright (C) 2011-2022 by GateHouse A/S
 // All Rights Reserved.
 // http://www.gatehouse.dk
 // mailto:gh@gatehouse.dk
 //====================================================================
+
 #include "proxy_global.h"
 #include "cppcms_util.h"
 #include <cppcms/view.h>
@@ -94,7 +95,7 @@ void proxy_global::stopall()
 
 bool proxy_global::host_activate(const std::string& param)
 {
-   DOUT(__FUNCTION__ <<  ": " << param );
+   DOUT(__FUNCTION__ <<  ": " << param);
    std::lock_guard<std::mutex> l(this->m_mutex_list);
    for (auto& host : this->remotehosts)
    {
@@ -147,7 +148,7 @@ void proxy_global::client_set_active(const std::string& param, int id, bool acti
 
 int proxy_global::host_test(const std::string& param)
 {
-   DOUT(__FUNCTION__ <<  ": " << param );
+   DOUT(__FUNCTION__ <<  ": " << param);
    std::lock_guard<std::mutex> l(this->m_mutex_list);
    for (auto& host : this->remotehosts)
    {
@@ -373,12 +374,12 @@ void proxy_global::unpopulate_json( cppcms::json::value obj )
       }
       if (keep)
       {
-         DOUT("keeping client on port: " << (*iter)->port() );
+         DOUT("keeping client on port: " << (*iter)->port());
          iter++;
       }
       else
       {
-         DOUT("Stopping and removing client on port: " << (*iter)->port() );
+         DOUT("Stopping and removing client on port: " << (*iter)->port());
          (*iter)->stop();
          iter = this->localclients.erase(iter);
       }
@@ -408,14 +409,14 @@ void proxy_global::unpopulate_json( cppcms::json::value obj )
       }
       if (keep)
       {
-         DOUT("keeping host on port: " << ehost.port() << " Checking and removing any cancelled remote connections, count: " << removed.size() );
+         DOUT("keeping host on port: " << ehost.port() << " Checking and removing any cancelled remote connections, count: " << removed.size());
          ehost.remove_any(removed);
 
          eiter++;
       }
       else
       {
-         DOUT("Stopping and removing host on port: " << ehost.port() );
+         DOUT("Stopping and removing host on port: " << ehost.port());
          ehost.stop();
          eiter = this->remotehosts.erase(eiter);
       }
@@ -701,10 +702,17 @@ bool proxy_global::execute_openssl()
 #ifdef _WIN32
    params = " -config openssl.cnf ";
 #endif
-   int res = process::execute_process( "openssl", " req " + params + "-x509 -nodes -days 100000 -subj /C=DK/ST=Denmark/L=GateHouse/CN=" + this->m_name + " -newkey rsa:3072 -keyout my_private_key.pem -out my_public_cert.pem "
-   , [&](const std::string &_out) { DOUT(_out); }
-   , [&](const std::string &_err) { DERR(_err); }
-   );
+   int res = process::execute_process("openssl",
+                                      " req " + params + "-x509 -nodes -days 100000 -subj /C=DK/ST=Denmark/L=GateHouse/CN=" +
+                                      this->m_name + " -newkey rsa:3072 -keyout my_private_key.pem -out my_public_cert.pem ",
+                                      [&](const std::string &_out)
+                                      {
+                                         DOUT(_out);
+                                      },
+                                      [&](const std::string &_err)
+                                      {
+                                         DERR(_err);
+                                      });
    DOUT("Execute openssl result: " << res);
    return res == 0;
 }
@@ -713,6 +721,7 @@ bool proxy_global::execute_openssl()
 //
 bool proxy_global::load_configuration()
 {
+   DOUT("Loading configuration from " << config_filename);
    static int openssl_count = 0;
    std::string certificate_common_name;
    try
@@ -724,7 +733,7 @@ bool proxy_global::load_configuration()
          ASSERTE(my_object.load( ifs, false, &line ), uniproxy::error::parse_file_failed, config_filename + " on line: " + mylib::to_string(line));
          this->populate_json(my_object,proxy_global::config|proxy_global::web);
       }
-      ASSERTE(!this->m_name.empty(),uniproxy::error::certificate_name_unknown, config_filename + " should contain \"config\" : { \"name\" : \"own_certificate_name\" }" );
+      ASSERTE(!this->m_name.empty(),uniproxy::error::certificate_name_unknown, config_filename + " should contain \"config\" : { \"name\" : \"own_certificate_name\" }");
 
       // NB!! For these we should not overwrite any existing files. If the files exist, but there is an error in them we need to get user interaction ??
       bool load_private = false;
@@ -738,7 +747,7 @@ bool proxy_global::load_configuration()
             ctx.use_private_key_file(my_private_key_name,boost::asio::ssl::context_base::file_format::pem,ec1);
             ctx.use_certificate_file(my_public_cert_name,boost::asio::ssl::context_base::file_format::pem,ec2);
             load_private = !ec1 && !ec2;
-            DOUT("Private handling: " << load_private << " 1:" << ec1 << " " << (ec1) << " " << !ec1 << " 2:" << ec2 << " " << (ec2) << " " << !ec2 );
+            DOUT("Private handling: " << load_private << " 1:" << ec1 << " " << (ec1) << " " << !ec1 << " 2:" << ec2 << " " << (ec2) << " " << !ec2);
             if (!load_private)
             {
                log().add("Found private file which does NOT contain a valid private key. Delete file: " + my_private_key_name + " and try again");
@@ -751,7 +760,7 @@ bool proxy_global::load_configuration()
          if ( load_public )
          {
             certificate_common_name = get_common_name(certs[0]);
-            DOUT("Found own private certificate with name: \"" << certificate_common_name + "\"" );
+            DOUT("Found own private certificate with name: \"" << certificate_common_name + "\"");
             if ( this->m_name == certificate_common_name )
             {
                DOUT("Certificate do match own name");
@@ -766,7 +775,7 @@ bool proxy_global::load_configuration()
       {
          if ( this->m_name.length() == 0 )
          {
-            throw std::runtime_error("certificate files not found and cannot be generated because the name is not specified in the configuration json file" );
+            throw std::runtime_error("certificate files not found and cannot be generated because the name is not specified in the configuration json file");
          }
          if ( this->execute_openssl() )
          {
@@ -807,7 +816,7 @@ bool proxy_global::load_configuration()
    }
    catch( std::exception &exc )
    {
-      DOUT(__FUNCTION__ << " exception: " << exc.what() );
+      DOUT(__FUNCTION__ << " exception: " << exc.what());
       return false;
    }
    return true;
@@ -873,7 +882,7 @@ session_data &proxy_global::get_session_data( cppcms::session_interface &_sessio
          return *this->m_sessions[index];
       }
    }
-   DOUT("Adding new session for id: " << id );
+   DOUT("Adding new session for id: " << id);
    auto p = std::make_shared<session_data>( id );
    this->m_sessions.push_back( p );
    return *p;
@@ -908,39 +917,44 @@ bool proxy_global::load_certificate_names( const std::string & _filename )
 }
 
 
-std::string proxy_global::SetupCertificatesServer(boost::asio::ip::tcp::socket &_remote, const std::vector<std::string> &_certnames)
+std::string proxy_global::SetupCertificatesServer(boost::asio::ip::tcp::socket& _remote,
+                                                  boost::asio::io_service& _io_service,
+                                                  const std::vector<std::string>& _certnames)
 {
    try
    {
-      DOUT( __FUNCTION__ << " certificate names: " << _certnames );
-      const int buffer_size = 4000;
-      char buffer[buffer_size]; //
-      memset(buffer,0,buffer_size);
+      DOUT(__FUNCTION__ << " certificate names: " << _certnames);
       ASSERTE( _certnames.size() > 0, uniproxy::error::connection_name_unknown, "" );
 
-      int length = _remote.read_some( boost::asio::buffer( buffer, buffer_size ) );
-      DOUT(info(_remote) << "Received: " << length << " bytes");
-      ASSERTE( length > 0 && length < buffer_size, uniproxy::error::certificate_invalid, "received" ); // NB!! Check the overflow situation.....
-      DOUT(info(_remote) << "SSL Possible Certificate received: " << buffer );
+      const int buffer_size = 4000;
+      char buffer[buffer_size];
+      memset(buffer, 0, buffer_size);
+      read_with_timeout(_remote, _io_service, boost::asio::buffer(buffer, buffer_size),
+                        boost::posix_time::seconds(5));
+      int length = strlen(buffer);
+
+      ASSERTE(length > 0 && length < buffer_size, uniproxy::error::certificate_invalid, "received"); // NB!! Check the overflow situation.....
+      DOUT(info(_remote) << "SSL Possible Certificate received (length " << length << "): " << buffer);
       std::vector<certificate_type> remote_certs, local_certs;
 
       ASSERTE(load_certificates_string( buffer, remote_certs ) && remote_certs.size() == 1, uniproxy::error::certificate_invalid, "received");
       std::string remote_name = get_common_name( remote_certs[0] );
       DOUT(info(_remote) << "Received certificate name: " << remote_name << " for connection: " << _certnames);
       
-      if (std::find(_certnames.begin(),_certnames.end(),remote_name) == _certnames.end())
+      if (std::find(_certnames.begin(), _certnames.end(), remote_name) == _certnames.end())
       {
          DOUT(info(_remote) << "Certificate exchange attempt by: " << remote_name << " did not match any expected: " << _certnames);
          return std::string();
       }
 
-      ASSERTE( load_certificates_file( my_certs_name, local_certs ), uniproxy::error::certificate_not_found, std::string( " in file ") + my_certs_name + " for connection: " );
+      ASSERTE( load_certificates_file( my_certs_name, local_certs ), uniproxy::error::certificate_not_found,
+               std::string( " in file ") + my_certs_name + " for connection: " );
 
       for ( auto iter = local_certs.begin(); iter != local_certs.end(); )
       {
          if ( remote_name == get_common_name( *iter ) )
          {
-            DOUT(info(_remote) << "Removing old existing certificate name for replacement: " << remote_name );
+            DOUT(info(_remote) << "Removing old existing certificate name for replacement: " << remote_name);
             iter = local_certs.erase( iter );
          }
          else
@@ -953,34 +967,36 @@ std::string proxy_global::SetupCertificatesServer(boost::asio::ip::tcp::socket &
       this->load_certificate_names( my_certs_name );
       return remote_name;
    }
-   catch( std::exception &exc )
+   catch (std::exception& exc)
    {
-      DOUT(info(_remote) << __FUNCTION__ << " exception: " << exc.what() );
+      DOUT(info(_remote) << __FUNCTION__ << " exception: " << exc.what());
       log().add(exc.what());
    }
    return std::string();
 }
 
 
-bool proxy_global::SetupCertificatesClient(boost::asio::ip::tcp::socket &_remote, const std::string &_connection_name)
+bool proxy_global::SetupCertificatesClient(boost::asio::ip::tcp::socket& _remote, const std::string& _connection_name)
 {
    try
    {
-      DOUT(info(_remote) << __FUNCTION__ << " connection name: " << _connection_name );
+      DOUT(info(_remote) << __FUNCTION__ << " connection name: " << _connection_name);
+      std::this_thread::sleep_for(std::chrono::seconds(1));
       const int buffer_size = 4000;
-      char buffer[buffer_size]; //
-      memset(buffer,0,buffer_size);
+      char buffer[buffer_size];
+      memset(buffer, 0, buffer_size);
       ASSERTE( _connection_name.length() > 0, uniproxy::error::connection_name_unknown, "" );
 
       std::string cert = readfile( my_public_cert_name );
       ASSERTE( cert.length() > 0, uniproxy::error::certificate_not_found, std::string( " certificate not found in file: ") + my_certs_name );
       int count = _remote.write_some( boost::asio::buffer( cert, cert.length() ) );
       DOUT(info(_remote) << "Wrote certificate: " << count << " of " << cert.length() << " bytes ");
+      DOUT("Sent: " << cert);
       return true;
    }
    catch( std::exception &exc )
    {
-      DOUT(info(_remote) << __FUNCTION__ << " exception: " << exc.what() );
+      DOUT(info(_remote) << __FUNCTION__ << " exception: " << exc.what());
       log().add(exc.what());
    }
    return false;
@@ -997,7 +1013,8 @@ bool proxy_global::certificate_available( const std::string &_cert_name)
 //-------------------------------------
 
 
-client_certificate_exchange::client_certificate_exchange( ) : mylib::thread( [](){} )
+client_certificate_exchange::client_certificate_exchange()
+   : mylib::thread([](){ })
 {
 }
 
@@ -1014,7 +1031,7 @@ void client_certificate_exchange::unlock()
 
 void client_certificate_exchange::start( const std::vector<LocalEndpoint> &eps )
 {
-   this->mylib::thread::start( [this,eps]( ){this->thread_proc(eps);} );
+   this->mylib::thread::start([this, eps](){ this->thread_proc(eps); });
 }
 
 
@@ -1105,7 +1122,7 @@ void client_certificate_exchange::thread_proc( const std::vector<LocalEndpoint> 
 
 
 activate_host::activate_host()
-:mylib::thread([this]{this->interrupt();})
+   : mylib::thread([this]{this->interrupt();})
 {
    
 }
@@ -1116,7 +1133,7 @@ void activate_host::start(int _port)
    if (!this->mylib::thread::is_running())
    {
       DOUT("Starting activation host on port: " << _port);
-      this->mylib::thread::start([=]{this->threadproc(_port);});
+      this->mylib::thread::start([this, _port]{this->threadproc(_port);});
    }
    else
    {
@@ -1135,6 +1152,7 @@ void activate_host::start(int _port)
 
 void activate_host::interrupt()
 {
+   DOUT(__FUNCTION__);
    if (int sock = get_socket(this->mp_acceptor, this->m_mutex_activate); sock != 0)
    {
       // Do we need a cancel??
@@ -1193,7 +1211,8 @@ void activate_host::threadproc(int _port)
                }
             }
          }
-         std::string certname = global.SetupCertificatesServer(socket, activate_names);
+         io_service.reset();
+         std::string certname = global.SetupCertificatesServer(socket, io_service, activate_names);
          if (!certname.empty() && global.SetupCertificatesClient(socket, certname))
          {
             DOUT("Succeeded in exchanging certificates for " << certname);

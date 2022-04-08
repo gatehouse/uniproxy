@@ -1,4 +1,4 @@
-uniproxy
+Uniproxy
 ========
 
 The Universal Proxy is an application with the purpose of providing maritime authorities (and anyone else) 
@@ -11,7 +11,23 @@ The documentation ie. the requirement specification is available but will not be
 
 
 Log:
-========
+====
+
+2021-03-29 PBondo
+-----------------
+Bump release 1.7.3
+
+Fix issue on server with 50 (30+) simultanous client connects e.g. on restart with active clients.
+Fix issue on server with potential hang on ssl shutdown (this was previously fixed on client). Can be provoked with a client docker pause
+Fix a couple of c++20 compiler warnings
+
+2020-07-24 PBondo
+-----------------
+Bump release 1.7.0
+
+Fix slow memory leak (side effect frem previous fix)
+Fix allow only one connection on server end (side effect frem previous fix)
+Fix 2 minor data races for printout.
 
 2020-03-17 PBondo
 -----------------
@@ -174,8 +190,8 @@ make
 The codelite project files should be correct.
 
 
-Windows (Windows 7)
--------------------
+Windows (Windows 10)
+--------------------
 Dependencies:
 
 Python (www.python.org)
@@ -186,7 +202,7 @@ cppcms (cppcms.com)
 
 mkdir build64
 cd build64
-cmake -G "Visual Studio 12 2013 Win64 ..
+cmake -G "Visual Studio 16 2019" ..
 msbuild /p:Configuration=Release uniproxy.sln
 
 
@@ -194,7 +210,7 @@ Also boost process
 http://www.highscore.de/boost/process.zip
 
 
-Contributers:
+Contributors:
 -------------
-Poul Bondo (GateHouse) Founder and current Maintainer
 
+Poul Bondo (GateHouse) Founder and current Maintainer
