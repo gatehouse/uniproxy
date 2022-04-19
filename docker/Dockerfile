@@ -4,8 +4,6 @@ ARG DEBIAN_FRONTEND=noninteractive
 
 RUN rm /bin/sh && ln -s /bin/bash /bin/sh
 
-COPY run-uniproxy.sh /var/lib/uniproxy/
-
 #
 # Uniproxy dependencies
 #
@@ -16,6 +14,8 @@ WORKDIR /tmp
 COPY *.deb ./
 
 RUN dpkg -i *.deb
+
+COPY run-uniproxy.sh /usr/local/bin
 
 #
 # run uniproxy
@@ -28,4 +28,4 @@ EXPOSE 1240
 EXPOSE 8085
 EXPOSE 25500
 
-CMD /var/lib/uniproxy/run-uniproxy.sh
+CMD /usr/local/bin/run-uniproxy.sh
