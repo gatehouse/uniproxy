@@ -4,7 +4,7 @@ ARG DEBIAN_FRONTEND=noninteractive
 
 RUN rm /bin/sh && ln -s /bin/bash /bin/sh
 
-COPY run-uniproxy.sh ./
+COPY run-uniproxy.sh /var/lib/uniproxy/
 
 #
 # Uniproxy dependencies
@@ -24,8 +24,8 @@ USER root
 
 VOLUME /var/lib/uniproxy
 
-WORKDIR /var/lib/uniproxy
 EXPOSE 1240
 EXPOSE 8085
 EXPOSE 25500
-CMD run-uniproxy.sh
+
+CMD /var/lib/uniproxy/run-uniproxy.sh
