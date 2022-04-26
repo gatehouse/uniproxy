@@ -14,7 +14,7 @@ WORKDIR /tmp
 COPY *.deb ./
 
 RUN dpkg -i *.deb
-RUN rm -f --verbose *
+RUN rm -f *
 
 COPY run-uniproxy.sh /usr/local/bin
 
@@ -29,4 +29,5 @@ EXPOSE 1240
 EXPOSE 8085
 EXPOSE 25500
 
+WORKDIR /var/lib/uniproxy
 CMD /usr/local/bin/run-uniproxy.sh
