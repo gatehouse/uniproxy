@@ -13,7 +13,8 @@ WORKDIR /tmp
 
 COPY *.deb ./
 
-RUN dpkg -i *.deb && rm -f *
+RUN dpkg -i *.deb
+RUN rm -f --verbose *
 
 COPY run-uniproxy.sh /usr/local/bin
 
