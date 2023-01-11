@@ -3,19 +3,25 @@
 #
 #!/bin/bash
 
+if [ $# -lt 1 ] 
+then
+   echo "Please specify the source dir."
+   exit 1
+fi
+
 if [ "$(basename $PWD)" = "deb" ]
 then
    echo "Run this in the build dir!"
    exit 1
 fi
 
-version=`sed -n -e  's/const.*version.*"\(.*\)";/\1/p' ../release.cpp`
+version=`sed -n -e 's/const.*version.*"\(.*\)";/\1/p' $1/release.cpp`
 
-ln -s ../deb/postinstall-pak
-ln -s ../deb/preinstall-pak
-ln -s ../deb/preremove-pak
-ln -s ../deb/postremove-pak
-ln -s ../deb/description-pak
+ln -s $1/deb/postinstall-pak
+ln -s $1/deb/preinstall-pak
+ln -s $1/deb/preremove-pak
+ln -s $1/deb/postremove-pak
+ln -s $1/deb/description-pak
 touch install_manifest.txt
 
 make
