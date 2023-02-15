@@ -14,9 +14,9 @@ cd cppcms
 git checkout $VERSION_CPPCMS_GIT
 mkdir build
 cd build
-cmake .. 
+cmake .. -DCMAKE_INSTALL_PREFIX=/usr/local
 make -j 4
-make install
+sudo make install
 popd
 
 # Build
