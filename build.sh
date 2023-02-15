@@ -2,7 +2,7 @@
 
 # Std ubuntu libraris
 sudo apt update
-sudo apt install -y checkinstall cmake git g++ python libssl-dev libgcrypt20-dev libicu-dev libpcre++-dev libboost-dev
+sudo apt install -y checkinstall cmake git g++ python libssl-dev libgcrypt20-dev libicu-dev libpcre++-dev libboost-dev libsystemd-dev
 
 # CppCMS
 VERSION_CPPCMS=1.2.1
