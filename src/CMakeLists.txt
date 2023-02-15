@@ -70,7 +70,7 @@ IF (WIN32)
 
 	set(CPP_SOURCE
 		${CPP_SOURCE}
-		${LANG}/openssl-1.1.0e/include/openssl/applink.c
+		${LANG}/openssl-1.1.1t/include/openssl/applink.c
 		../src/win_util.cpp
 		../src/win_util.h
 		)
