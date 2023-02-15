@@ -15,7 +15,7 @@ git checkout $VERSION_CPPCMS_GIT
 mkdir build
 cd build
 cmake .. 
-make
+make -j 4
 make install
 popd
 
