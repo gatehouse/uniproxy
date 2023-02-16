@@ -10,7 +10,7 @@
 // project Mona Lisa work package 4 for the Universal Proxy Application
 //
 // This version is released under the GNU General Public License with restrictions.
-// See the doc/license.txt file.
+// See the LICENSE.txt file.
 //
 // Copyright (C) by GateHouse A/S
 // All Rights Reserved.
