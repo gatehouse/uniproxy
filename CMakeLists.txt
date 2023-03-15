@@ -1,13 +1,17 @@
-cmake_minimum_required(VERSION 2.8)
+cmake_minimum_required(VERSION 3.10)
 
 project(uniproxy_proj)
 
 OPTION(OPT_SYSTEMD "Use systemd on Linux" ON)
 
 IF (WIN32)
-	SET(VC_MAJOR "14" CACHE STRING "Visual Studio major version")
-	SET(VC_MINOR "2" CACHE STRING "Visual Studio minor version")
+	#SET(VC_MAJOR "17" CACHE STRING "Visual Studio major version")
+	#SET(VC_MINOR "2" CACHE STRING "Visual Studio minor version")
 	SET(LANG c:/lang)
+	SET(CPPCMS_DIR ${LANG}/cppcms-2.0.0.beta2)
+	SET(BOOST_DIR ${LANG}/boost/1_81_0)
+	SET(OPENSSL_DIR ${LANG}/openssl-3.1.0)
+	SET(LIBS_DIR ${LANG}/w64-vc17)
 ELSE()
 	SET(LANG $ENV{HOME}/lang)
 ENDIF()
@@ -18,14 +22,21 @@ include_directories(. src/ libs/)
 IF (WIN32)
 
 	ADD_DEFINITIONS(-D_WIN32_WINNT=0x0501 /wd4250 /wd4018  /wd4267 /wd4996 /std:c++17 /permissive- -D_HAS_AUTO_PTR_ETC /MP2)
-	include_directories(${uniproxy_SOURCE_DIR} ${LANG}/w64-vc${VC_MAJOR}/include ${LANG}/cppcms-1.2.1/include ${LANG}/boost/1_73_0  ${LANG}/openssl-1.1.1t/include/)
-	LINK_DIRECTORIES("${LANG}/w64-vc${VC_MAJOR}/lib"
-           "${LANG}/openssl-1.1.1t/lib/"
-           ${LANG}/boost/1_73_0/lib64-msvc-${VC_MAJOR}.${VC_MINOR})
-        SET(CPPCMS_LIBPATH ${LANG}/cppcms-1.2.1/lib)
-        SET(CPPCMS_LIBRARY
-           debug "${CPPCMS_LIBPATH}/Debug/booster-d.lib" optimized "${CPPCMS_LIBPATH}/Release/booster.lib"
-           debug "${CPPCMS_LIBPATH}/Debug/cppcms-d.lib" optimized "${CPPCMS_LIBPATH}/Release/cppcms.lib")
+	include_directories(${uniproxy_SOURCE_DIR} ${LIBS_DIR}/include ${BOOST_DIR} "${OPENSSL_DIR}/include")
+	link_directories(${LIBS_DIR}/lib ${BOOST_DIR}/lib64-msvc-14.3 "${OPENSSL_DIR}/lib")
+	#c:/lang/w64-vc19/lib/ c:/lang/boost_1_81_0/lib64-msvc-14.3/ "c:/program files/openssl-win64/lib")
+	#include_directories(${uniproxy_SOURCE_DIR} ${LANG}/w64-vc${VC_MAJOR}/include c:/lang/boost_1_81_0/ "c:/program files/openssl-win64/include/")
+	#link_directories(c:/lang/w64-vc19/lib/ c:/lang/boost_1_81_0/lib64-msvc-14.3/ "c:/program files/openssl-win64/lib")
+
+
+
+	#LINK_DIRECTORIES("${LANG}/w64-vc${VC_MAJOR}/lib"
+    #       "${LANG}/openssl-1.1.1t/lib/"
+    #       ${LANG}/boost/1_73_0/lib64-msvc-${VC_MAJOR}.${VC_MINOR})
+    #    SET(CPPCMS_LIBPATH ${LANG}/cppcms-1.2.1/lib)
+    #    SET(CPPCMS_LIBRARY
+    #       debug "${CPPCMS_LIBPATH}/Debug/booster-d.lib" optimized "${CPPCMS_LIBPATH}/Release/booster.lib"
+    #       debug "${CPPCMS_LIBPATH}/Debug/cppcms-d.lib" optimized "${CPPCMS_LIBPATH}/Release/cppcms.lib")
 	# Use multi cores
 	#SET(VISUAL_STUDIO_MP_FLAG "/MP")
 

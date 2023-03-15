@@ -9,7 +9,7 @@ IF (WIN32)
 
 add_custom_command(
   OUTPUT views.cpp
-  COMMAND py -2 "${LANG}/cppcms-1.2.1/bin/cppcms_tmpl_cc" "${CMAKE_CURRENT_SOURCE_DIR}/../webserver/master.tmpl" "${CMAKE_CURRENT_SOURCE_DIR}/../webserver/view_config.tmpl" "${CMAKE_CURRENT_SOURCE_DIR}/../webserver/view_status.tmpl" -o views.cpp
+  COMMAND python "${CPPCMS_DIR}/bin/cppcms_tmpl_cc" "${CMAKE_CURRENT_SOURCE_DIR}/../webserver/master.tmpl" "${CMAKE_CURRENT_SOURCE_DIR}/../webserver/view_config.tmpl" "${CMAKE_CURRENT_SOURCE_DIR}/../webserver/view_status.tmpl" -o views.cpp
   DEPENDS ../webserver/master.tmpl ../webserver/view_config.tmpl ../webserver/view_status.tmpl
   WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
   COMMENT "Precompiling views"
@@ -70,14 +70,18 @@ IF (WIN32)
 
 	set(CPP_SOURCE
 		${CPP_SOURCE}
-		${LANG}/openssl-1.1.1t/include/openssl/applink.c
+		"c:/program files/openssl-win64/include/openssl/applink.c"
 		../src/win_util.cpp
 		../src/win_util.h
 		)
 
+    SET(CPPCMS_LIBRARY
+        "${LIBS_DIR}/lib/libbooster.lib"
+        "${LIBS_DIR}/lib/libcppcms.lib")
+
 	add_executable( ${PROJECT_NAME} ${CPP_SOURCE})
 
-	target_link_libraries (${PROJECT_NAME} gatehouse ${CPPCMS_LIBRARY} libcrypto libssl)
+	target_link_libraries (${PROJECT_NAME} gatehouse ${CPPCMS_LIBRARY} libcrypto_static libssl_static)
 
 ELSE()
 

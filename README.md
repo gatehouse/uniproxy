@@ -200,9 +200,16 @@ openssl (www.openssl.org)
 boost (www.boost.org)
 cppcms (cppcms.com)
 
+C:\lang\cppcms-2.0.0.beta2
+mkdir build
+cd build
+"c:\Program Files\CMake\bin\cmake" -G "NMake Makefiles"  -DCMAKE_INSTALL_PREFIX=c:\lang\w64-vc17 -DCMAKE_BUILD_TYPE=Release -DDISABLE_SHARED=ON -DDISABLE_TCPCACHE=ON ..
+nmake
+nmake install
+
 mkdir build64
 cd build64
-cmake -G "Visual Studio 16 2019" ..
+cmake -G "Visual Studio 17 2022" ..
 msbuild /p:Configuration=Release uniproxy.sln
 
 
