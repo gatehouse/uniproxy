@@ -210,7 +210,7 @@ nmake install
 mkdir build64
 cd build64
 cmake -G "Visual Studio 17 2022" ..
-msbuild /p:Configuration=Release uniproxy.sln
+msbuild /p:Configuration=Release uniproxy_proj.sln
 
 
 Also boost process
