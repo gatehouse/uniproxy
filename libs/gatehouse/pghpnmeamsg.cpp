@@ -164,8 +164,8 @@ void TclNMEAMessage::Encode(std::string &_msg)
       m_iSequentialMessageIdentifier=0;
    }
 
-   int i;
-   int iMaxPayloadLength = m_iMaxContent;
+   size_t i;
+   size_t iMaxPayloadLength = m_iMaxContent;
 
    for (i=0;i<iFullSizeCount;i++)
    {
@@ -175,7 +175,7 @@ void TclNMEAMessage::Encode(std::string &_msg)
 
    if (iLen%m_iMaxContent!=0)
    {
-       EncodePart(_msg, m_aszPayload.substr(i*iMaxPayloadLength, iLen - (i*iMaxPayloadLength)));
+       EncodePart(_msg, m_aszPayload.substr(i*iMaxPayloadLength, (size_t)iLen - (i*iMaxPayloadLength)));
    }
 
 }
