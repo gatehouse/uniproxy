@@ -2,7 +2,6 @@ cmake_minimum_required(VERSION 3.10)
 
 project(uniproxy_proj)
 
-
 IF (WIN32)
 	SET(LANG c:/lang)
 	SET(CPPCMS_DIR ${LANG}/cppcms-2.0.0.beta2)
@@ -13,7 +12,6 @@ ELSE()
 	SET(LANG $ENV{HOME}/lang)
 	SET(BOOST_DIR /opt/boost/1.81.0)
 	SET(CPPCMS_DIR cppcms)
-   ##/opt/cppcms/1.2.1)
 ENDIF()
 
 
@@ -30,17 +28,11 @@ ELSE (WIN32)
 	ADD_DEFINITIONS(-g -std=c++17 -Wall -Wno-sign-compare)
 	ADD_DEFINITIONS(-Wl,--whole-archive -Wl,--no-while-archive, -Wno-deprecated-declarations)
 
-   #OPTION(OPT_SYSTEMD "Use systemd on Linux" ON)
-   #   IF (OPT_SYSTEMD)
-   #	   ADD_DEFINITIONS(-D_SYSTEMD_)
-   #   ENDIF()
-
 	include_directories(${BOOST_DIR}/include/ ${CPPCMS_DIR} ${CPPCMS_DIR}/booster ${CPPCMS_DIR}/build/ ${CPPCMS_DIR}/build/booster/)
 
 	LINK_DIRECTORIES(${BOOST_DIR}/lib/ ${CPPCMS_DIR}/build/ ${CPPCMS_DIR}/build/booster/)
 
 ENDIF (WIN32)
-
 
 ADD_SUBDIRECTORY(libs/gatehouse gatehouse)
 ADD_SUBDIRECTORY(src uniproxy)

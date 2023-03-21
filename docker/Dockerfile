@@ -16,12 +16,6 @@ COPY *.deb ./
 RUN dpkg -i *.deb
 RUN rm -f *
 
-#COPY run-uniproxy.sh /usr/local/bin
-#
-# run uniproxy
-#
-#USER root
-
 VOLUME /var/lib/uniproxy
 
 EXPOSE 1240
@@ -31,6 +25,5 @@ EXPOSE 25500
 USER uniproxy
 
 WORKDIR /var/lib/uniproxy
-#CMD /usr/local/bin/run-uniproxy.sh
 CMD /usr/local/bin/uniproxy
 
