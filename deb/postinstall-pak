@@ -18,19 +18,10 @@ if [ -f /.dockerenv ]; then
     # There is no rsyslog in docker
     echo "Running in Docker";
 else
-cat > /etc/rsyslog.d/42-uniproxy.conf << EOF
-# Begin /etc/rsyslog.d/42-uniproxy.conf
-if \$programname == 'uniproxy' then stop
-# End /etc/rsyslog.d/42-uniproxy.conf
-EOF
-
-    # setup rsyslog
-    systemctl restart rsyslog.service
-fi
-
 
 systemctl enable /etc/systemd/system/uniproxy.service
 systemctl start uniproxy.service
 
+fi
 exit 0
 

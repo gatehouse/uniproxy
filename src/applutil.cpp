@@ -97,6 +97,8 @@ namespace mylib
 
 std::ostream &dout()
 {
+   return std::cout;
+/*
    if ((++log().m_log_access_count % 1000000) == 0) // cycle the log.
    {
       log().m_log_file_index = (log().m_log_file_index + 1) % 10;
@@ -104,12 +106,14 @@ std::ostream &dout()
       log().m_logfile.open(log().filename(log().m_log_file_index));
    }
    return log().m_logfile;
+*/
 }
 
 
 std::ostream &derr()
 {
-   return log().m_logfile;
+   return std::cout;
+   //return log().m_logfile;
 }
 
 

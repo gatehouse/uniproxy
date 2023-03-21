@@ -20,7 +20,7 @@ ELSE (WIN32)
 
 add_custom_command(
   OUTPUT views.cpp
-  COMMAND python3 ${CPPCMS_DIR}/bin/cppcms_tmpl_cc "${CMAKE_CURRENT_SOURCE_DIR}/../webserver/master.tmpl" "${CMAKE_CURRENT_SOURCE_DIR}/../webserver/view_config.tmpl" "${CMAKE_CURRENT_SOURCE_DIR}/../webserver/view_status.tmpl" -o views.cpp
+  COMMAND python3 ../../${CPPCMS_DIR}/bin/cppcms_tmpl_cc "${CMAKE_CURRENT_SOURCE_DIR}/../webserver/master.tmpl" "${CMAKE_CURRENT_SOURCE_DIR}/../webserver/view_config.tmpl" "${CMAKE_CURRENT_SOURCE_DIR}/../webserver/view_status.tmpl" -o views.cpp
   DEPENDS ../webserver/master.tmpl ../webserver/view_config.tmpl ../webserver/view_status.tmpl
   WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
   COMMENT "Precompiling views"
