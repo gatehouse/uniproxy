@@ -1,0 +1,15 @@
+services:
+  uniproxy:
+    env_file: .env
+    build: .
+    container_name: uniproxy
+    #command: ["/bin/bash", "-c", "sudo apache2ctl start;uvicorn src.main:app --host 0.0.0.0 --port 8079 --reload"]
+    #CMD ["/bin/bash", "-c", "echo FIRST COMMAND;echo SECOND COMMAND"]
+    ports:
+      - 25500:25500
+      - 8085:8085
+      - 1240:1240
+    #user: uniproxy
+    restart: always
+    #unless_stopped
+
