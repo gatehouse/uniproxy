@@ -28,9 +28,9 @@ ELSE (WIN32)
 	ADD_DEFINITIONS(-g -std=c++17 -Wall -Wno-sign-compare)
 	ADD_DEFINITIONS(-Wl,--whole-archive -Wl,--no-while-archive, -Wno-deprecated-declarations)
 
-	include_directories(${BOOST_DIR}/include/ ${CPPCMS_DIR} ${CPPCMS_DIR}/booster ${CPPCMS_DIR}/build/ ${CPPCMS_DIR}/build/booster/)
+	include_directories(${BOOST_DIR}/include/ ${CPPCMS_DIR}/include/ ${CPPCMS_DIR}/booster/)
 
-	LINK_DIRECTORIES(${BOOST_DIR}/lib/ ${CPPCMS_DIR}/build/ ${CPPCMS_DIR}/build/booster/)
+	LINK_DIRECTORIES(${BOOST_DIR}/lib/ ${CPPCMS_DIR}/lib/)
 
 ENDIF (WIN32)
 
