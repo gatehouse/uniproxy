@@ -11,7 +11,7 @@ IF (WIN32)
 ELSE()
 	SET(LANG $ENV{HOME}/lang)
 	SET(BOOST_DIR /opt/boost/1.81.0)
-	SET(CPPCMS_DIR cppcms)
+	SET(CPPCMS_DIR /opt/cppcms/2.0.0)
 ENDIF()
 
 
