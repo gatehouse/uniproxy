@@ -16,7 +16,7 @@ mkdir build
 cd build
 cmake .. -DCMAKE_INSTALL_PREFIX=/opt/cppcms/$VERSION_CPPCMS
 make -j 4
-#sudo make install
+sudo make install
 popd
 
 # Build
