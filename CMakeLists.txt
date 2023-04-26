@@ -3,25 +3,22 @@ cmake_minimum_required(VERSION 3.10)
 project(uniproxy_proj)
 
 IF (WIN32)
-	SET(LANG c:/lang)
-	SET(CPPCMS_DIR ${LANG}/cppcms-2.0.0.beta2)
-	SET(BOOST_DIR ${LANG}/boost/1_81_0)
-	SET(OPENSSL_DIR ${LANG}/openssl-3.1.0)
-	SET(LIBS_DIR ${LANG}/w64-vc17)
+	SET(CPPCMS_DIR c:/local/cppcms-2.0.0)
+	SET(BOOST_DIR c:/local/boost_1_82_0)
+	SET(OPENSSL_DIR c:/local/openssl-3.1.0)
 ELSE()
 	SET(LANG $ENV{HOME}/lang)
 	SET(BOOST_DIR /opt/boost/1.81.0)
 	SET(CPPCMS_DIR /opt/cppcms/2.0.0)
 ENDIF()
 
-
 include_directories(. src/ libs/)
 
 IF (WIN32)
 
 	ADD_DEFINITIONS(-D_WIN32_WINNT=0x0501 /wd4250 /wd4018  /wd4267 /wd4996 /std:c++17 /permissive- -D_HAS_AUTO_PTR_ETC /MP2)
-	include_directories(${uniproxy_SOURCE_DIR} ${LIBS_DIR}/include ${BOOST_DIR} "${OPENSSL_DIR}/include")
-	link_directories(${LIBS_DIR}/lib ${BOOST_DIR}/lib64-msvc-14.3 "${OPENSSL_DIR}/lib")
+	include_directories(${uniproxy_SOURCE_DIR} ${CPPCMS_DIR}/include ${BOOST_DIR} "${OPENSSL_DIR}/include")
+	link_directories(${CPPCMS_DIR}/lib ${BOOST_DIR}/lib64-msvc-14.3 "${OPENSSL_DIR}/lib")
 
 ELSE (WIN32)
 

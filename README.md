@@ -187,8 +187,6 @@ cd build
 cmake ..
 make
 
-The codelite project files should be correct.
-
 
 Windows (Windows 10)
 --------------------
@@ -200,24 +198,28 @@ openssl (www.openssl.org)
 boost (www.boost.org)
 cppcms (cppcms.com)
 
+boost:
+- Find windows binary installer and install in default location
+
+Python
+- Install in default location (path)
+
+cppcms (unzip in e.g. C:\lang\cppcms-2.0.0.beta2):
 C:\lang\cppcms-2.0.0.beta2
 mkdir build
 cd build
-"c:\Program Files\CMake\bin\cmake" -G "NMake Makefiles"  -DCMAKE_INSTALL_PREFIX=c:\lang\w64-vc17 -DCMAKE_BUILD_TYPE=Release -DDISABLE_SHARED=ON -DDISABLE_TCPCACHE=ON ..
+"c:\Program Files\CMake\bin\cmake" -G "NMake Makefiles"  -DCMAKE_INSTALL_PREFIX=c:\local\cppcms-2.0.0 -DCMAKE_BUILD_TYPE=Release -DDISABLE_SHARED=ON -DDISABLE_TCPCACHE=ON ..
 nmake
 nmake install
 
+uniproxy (git clone https://github.com/gatehouse/uniproxy)
 mkdir build64
 cd build64
 cmake -G "Visual Studio 17 2022" ..
 msbuild /p:Configuration=Release uniproxy_proj.sln
-
-
-Also boost process
-http://www.highscore.de/boost/process.zip
+cmake -G "NMake Makefiles" -DCMAKE_BUILD_TYPE=Release   ..
 
 
 Contributors:
 -------------
-
 Poul Bondo (GateHouse) Founder and current Maintainer

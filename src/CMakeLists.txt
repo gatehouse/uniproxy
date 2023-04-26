@@ -76,12 +76,12 @@ IF (WIN32)
 		)
 
     SET(CPPCMS_LIBRARY
-        "${LIBS_DIR}/lib/libbooster.lib"
-        "${LIBS_DIR}/lib/libcppcms.lib")
+        "${CPPCMS_DIR}/lib/libbooster.lib"
+        "${CPPCMS_DIR}/lib/libcppcms.lib")
 
 	add_executable( ${PROJECT_NAME} ${CPP_SOURCE})
 
-	target_link_libraries (${PROJECT_NAME} gatehouse ${CPPCMS_LIBRARY} libcrypto_static libssl_static)
+	target_link_libraries (${PROJECT_NAME} gatehouse ${CPPCMS_LIBRARY} libcrypto_static libssl_static dbghelp)
 
 ELSE()
 
