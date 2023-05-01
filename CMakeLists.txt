@@ -44,7 +44,7 @@ ELSE (WIN32)
 	INSTALL(FILES script/jquery.js DESTINATION ${CMAKE_INSTALL_PREFIX}/share/doc/uniproxy/)
 	INSTALL(FILES LICENSE.txt DESTINATION ${CMAKE_INSTALL_PREFIX}/share/doc/uniproxy/)
 	INSTALL(FILES doc/uniproxy.json.sample DESTINATION ${CMAKE_INSTALL_PREFIX}/share/doc/uniproxy/)
-	INSTALL(FILES deb/uniproxy.service DESTINATION /etc/systemd/system/)
+	#INSTALL(FILES deb/uniproxy.service DESTINATION /etc/systemd/system/)
 
 ENDIF (WIN32)
 
