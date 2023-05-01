@@ -208,7 +208,7 @@ cppcms (unzip in e.g. C:\lang\cppcms-2.0.0.beta2):
 C:\lang\cppcms-2.0.0.beta2
 mkdir build
 cd build
-"c:\Program Files\CMake\bin\cmake" -G "NMake Makefiles"  -DCMAKE_INSTALL_PREFIX=c:\local\cppcms-2.0.0 -DCMAKE_BUILD_TYPE=Release -DDISABLE_SHARED=ON -DDISABLE_TCPCACHE=ON ..
+"c:\Program Files\CMake\bin\cmake" -G "NMake Makefiles"  -DCMAKE_INSTALL_PREFIX=c:\local\cppcms-2.0.0 -DCMAKE_BUILD_TYPE=RelWithDebInfo -DDISABLE_SHARED=ON -DDISABLE_TCPCACHE=ON ..
 nmake
 nmake install
 
@@ -216,8 +216,8 @@ uniproxy (git clone https://github.com/gatehouse/uniproxy)
 mkdir build64
 cd build64
 cmake -G "Visual Studio 17 2022" ..
-msbuild /p:Configuration=Release uniproxy_proj.sln
-cmake -G "NMake Makefiles" -DCMAKE_BUILD_TYPE=Release   ..
+msbuild /p:Configuration=RelWithDebInfo uniproxy_proj.sln
+cmake -G "NMake Makefiles" -DCMAKE_BUILD_TYPE=RelWithDebInfo   ..
 
 
 Contributors:
