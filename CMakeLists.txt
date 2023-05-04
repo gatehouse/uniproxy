@@ -8,7 +8,7 @@ IF (WIN32)
 	SET(OPENSSL_DIR c:/local/openssl-1.1.1)
 ELSE()
 	SET(LANG $ENV{HOME}/lang)
-	SET(BOOST_DIR /opt/boost/1.76.0)
+	SET(BOOST_DIR /opt/boost/1.73.0)
 	SET(CPPCMS_DIR /opt/cppcms/2.0.0)
 ENDIF()
 

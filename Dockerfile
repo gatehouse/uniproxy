@@ -1,4 +1,4 @@
-FROM ubuntu:focal AS uniproxy_build
+FROM ubuntu:bionic AS uniproxy_build
 
 ENV DEBIAN_FRONTEND=noninteractive
 ENV VERSION_CPPCMS=2.0.0
@@ -11,19 +11,15 @@ RUN apt install -y \
     git \
     g++ \
     python3 \
-    python-is-python3 \
     libssl-dev \
     libgcrypt20-dev \
     libicu-dev \
     zlib1g-dev \
-    libpcre++-dev \
-    libboost-dev \
-    libboost-filesystem-dev \
-    libboost-system-dev \
-    libboost-chrono-dev \
-    libboost-regex-dev \
-    libboost-date-time-dev \
-    libboost-iostreams-dev
+    libpcre++-dev
+
+COPY boost73-dev_1.73.0-1_amd64.deb /
+
+RUN apt-get install ./boost73-dev_1.73.0-1_amd64.deb
 
 WORKDIR /cppcms_source
 RUN git clone https://github.com/artyom-beilis/cppcms.git .
@@ -61,3 +57,4 @@ RUN export RELEASE_VERSION=`sed -n -e 's/const.*version.*"\(.*\)";/\1/p' ../rele
     --exclude=/home  \
     --backup=no \
     -y
+
