@@ -430,6 +430,7 @@ void proxy_global::unpopulate_json( cppcms::json::value obj )
 void proxy_global::populate_json( cppcms::json::value &obj, int _json_acl )
 {
    std::lock_guard<std::mutex> l(this->m_mutex_list);
+   this->reset();
    if ( (_json_acl & clients) > 0 && obj["clients"].type() == cppcms::json::is_array )
    {
       DOUT(__FUNCTION__ << " populating clients");

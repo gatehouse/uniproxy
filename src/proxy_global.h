@@ -160,6 +160,13 @@ public:
    boost::posix_time::seconds m_activate_timeout = boost::posix_time::seconds(60);
    mylib::port_type m_activate_port = 25500;
 
+   void reset()
+   {
+      this->m_activate_port = 25500;
+      this->accept_short_certs = true;
+      this->min_tls_protocol = 12;
+   }
+
    // Own name to be used for generating own certificate.
    std::string m_name;
 
@@ -192,8 +199,8 @@ public:
 
    std::string m_log_path = "log/";
 
-   bool accept_short_certs = false;
-   int min_tls_protocol = 13; // TLS v 1.3
+   bool accept_short_certs = true;
+   int min_tls_protocol = 12; // TLS v 1.3
 
    void set_ssl_context(boost::asio::ssl::context& ctx);
 
