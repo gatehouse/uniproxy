@@ -1,4 +1,4 @@
-FROM ubuntu:focal AS uniproxy_build
+FROM ubuntu:jammy AS uniproxy_build
 
 ENV DEBIAN_FRONTEND=noninteractive
 ENV VERSION_CPPCMS=2.0.0
