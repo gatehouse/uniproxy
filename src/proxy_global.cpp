@@ -606,7 +606,10 @@ void proxy_global::populate_json( cppcms::json::value &obj, int _json_acl )
          DOUT("Activate timeout: " << this->m_activate_timeout);
       }
       cppcms::utils::check_port( config_obj, "activate.port", this->m_activate_port );
-
+      cppcms::utils::check_int(config_obj, "min_tls_protocol", this->min_tls_protocol);
+      cppcms::utils::check_bool(config_obj, "accept_short_certificates", this->accept_short_certs);
+      DOUT("min_tls_protocol: " << this->min_tls_protocol << " accept_short_certificates: " << this->accept_short_certs);
+      ASSERTE(this->min_tls_protocol >= 12 && this->min_tls_protocol <= 13, uniproxy::error::parse_file_failed, OSS("Invalid TLS protocol, must be 12 r 13 is: " << this->min_tls_protocol));
 // NB!! Check if new uniproxies
       if ( proxies.type() == cppcms::json::is_array )
       {
@@ -743,7 +746,9 @@ bool proxy_global::load_configuration()
          if ( ifs.good() )
          {
             boost::system::error_code ec1,ec2;
-            boost::asio::ssl::context ctx(boost::asio::ssl::context_base::tlsv12);
+            boost::asio::ssl::context ctx(boost::asio::ssl::context::tls);
+            set_ssl_context(ctx);
+
             ctx.use_private_key_file(my_private_key_name,boost::asio::ssl::context_base::file_format::pem,ec1);
             ctx.use_certificate_file(my_public_cert_name,boost::asio::ssl::context_base::file_format::pem,ec2);
             load_private = !ec1 && !ec2;
@@ -1007,6 +1012,63 @@ bool proxy_global::certificate_available( const std::string &_cert_name)
 {
    std::lock_guard<std::mutex> lock(this->m_mutex_certificates);
    return std::find(this->m_cert_names.begin(), this->m_cert_names.end(), _cert_name ) != this->m_cert_names.end();
+}
+
+static std::string get_password()
+{
+   return "1234";
+}
+
+void proxy_global::set_ssl_context(boost::asio::ssl::context& ctx)
+{
+   switch (this->min_tls_protocol)
+   {
+   case 12:
+      ctx.set_options(boost::asio::ssl::context::default_workarounds
+            | boost::asio::ssl::context::no_sslv2
+            | boost::asio::ssl::context::no_sslv3
+            | boost::asio::ssl::context::no_tlsv1
+            | boost::asio::ssl::context::no_tlsv1_1
+            | boost::asio::ssl::context::single_dh_use
+            );
+      break;
+   default:
+      ctx.set_options(boost::asio::ssl::context::default_workarounds
+            | boost::asio::ssl::context::no_sslv2
+            | boost::asio::ssl::context::no_sslv3
+            | boost::asio::ssl::context::no_tlsv1
+            | boost::asio::ssl::context::no_tlsv1_1
+            | boost::asio::ssl::context::no_tlsv1_2
+            | boost::asio::ssl::context::single_dh_use
+            );
+      break;
+   }
+   ctx.set_password_callback(boost::bind(&get_password));
+   ctx.set_verify_callback([this](bool preverified, boost::asio::ssl::verify_context& ctx)
+   {
+      if (!preverified)
+      {
+         X509_STORE_CTX *cts = ctx.native_handle();
+         int error = X509_STORE_CTX_get_error(cts);
+         if (error == X509_V_ERR_EE_KEY_TOO_SMALL)
+         {
+            if (this->accept_short_certs)
+            {
+               DOUT("Certificate too short but otherwise valid");
+               preverified = true;
+            }
+            else
+            {
+               DOUT("Certificate too short but otherwise valid, consider setting: config.accept_short_certs");
+            }
+         }
+      }
+      return preverified; 
+   });
+   ctx.set_verify_mode(boost::asio::ssl::context::verify_peer|boost::asio::ssl::context::verify_fail_if_no_peer_cert);
+   load_verify_file(ctx, my_certs_name);
+   ctx.use_certificate_chain_file(my_public_cert_name);
+   ctx.use_private_key_file(my_private_key_name, boost::asio::ssl::context::pem);
 }
 
 

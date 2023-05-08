@@ -168,12 +168,8 @@ void ProviderClient::threadproc_writer()
             timeout += 1000;
 
          boost::asio::io_service io_service;
-         boost::asio::ssl::context ssl_context(boost::asio::ssl::context::tlsv12);
-         ssl_context.set_password_callback(boost::bind(&ProviderClient::get_password,this));
-         ssl_context.set_verify_mode(boost::asio::ssl::context::verify_peer|boost::asio::ssl::context::verify_fail_if_no_peer_cert);
-         load_verify_file(ssl_context, my_certs_name);
-         ssl_context.use_certificate_chain_file(my_public_cert_name);
-         ssl_context.use_private_key_file(my_private_key_name, boost::asio::ssl::context::pem);
+         boost::asio::ssl::context ssl_context(boost::asio::ssl::context::tls);
+         global.set_ssl_context(ssl_context);
          ssl_socket remote_socket( io_service, ssl_context );
 
          mylib::protect_pointer<ssl_socket> p2( this->mp_remote_socket, remote_socket, this->m_mutex_base );
@@ -310,12 +306,8 @@ void ProviderClient::threadproc_reader()
          }
          else
          {
-            boost::asio::ssl::context ssl_context(boost::asio::ssl::context::tlsv12);
-            ssl_context.set_password_callback(boost::bind(&ProviderClient::get_password,this));
-            ssl_context.set_verify_mode(boost::asio::ssl::context::verify_peer|boost::asio::ssl::context::verify_fail_if_no_peer_cert);
-            load_verify_file(ssl_context, my_certs_name);
-            ssl_context.use_certificate_chain_file(my_public_cert_name);
-            ssl_context.use_private_key_file(my_private_key_name, boost::asio::ssl::context::pem);
+            boost::asio::ssl::context ssl_context(boost::asio::ssl::context::tls);
+            global.set_ssl_context(ssl_context);
             ssl_socket remote_socket( io_service, ssl_context );
             mylib::protect_pointer<ssl_socket> p2( this->mp_remote_socket, remote_socket, this->m_mutex_base );
             

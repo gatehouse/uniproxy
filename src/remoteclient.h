@@ -137,9 +137,6 @@ protected:
 
    void handle_accept( RemoteProxyClient::pointer new_session, const boost::system::error_code& error);
 
-   std::string get_password() const;
-
-
    void interrupt();
    void threadproc();
 

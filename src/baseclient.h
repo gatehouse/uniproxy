@@ -77,8 +77,6 @@ protected:
    const std::string dolog() const;
    void dolog( const std::string &_line );
 
-   std::string get_password() const;
-   
    void threadproc_activate(int _index);
    void start_activate(int _index);
    void stop_activate();

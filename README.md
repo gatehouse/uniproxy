@@ -130,7 +130,7 @@ Subsequently release 0.3.7.
 
 17/3-2015 PBondo
 ----------------
-Updated with TLSv12 as replacement for SSL.
+Updated with tlsv12 as replacement for SSL.
 
 
 24/4-2014 PBondo

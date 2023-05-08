@@ -191,7 +191,11 @@ public:
    std::ofstream m_in_data_log_file;
 
    std::string m_log_path = "log/";
-   
+
+   bool accept_short_certs = false;
+   int min_tls_protocol = 13; // TLS v 1.3
+
+   void set_ssl_context(boost::asio::ssl::context& ctx);
 
 protected:
 
@@ -200,7 +204,5 @@ protected:
 };
 
 extern proxy_global global;
-
-void load_verify_file(boost::asio::ssl::context& ctx, const std::string& filename);
 
 #endif

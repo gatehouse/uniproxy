@@ -471,20 +471,17 @@ void RemoteProxyClient::remote_threadproc()
 
 RemoteProxyHost::RemoteProxyHost(mylib::port_type local_port, const std::vector<RemoteEndpoint>& remote_ep, const std::vector<LocalEndpoint>& local_ep, PluginHandler& plugin)
 :  m_io_service(),
-   m_context(boost::asio::ssl::context::tlsv12),
+   m_context(boost::asio::ssl::context::tls),
    m_acceptor(m_io_service),
    m_plugin(plugin),
    m_local_port(local_port),
    m_thread([&](){this->interrupt();})
 {
+   global.set_ssl_context(m_context);
    this->m_active = true;
    this->m_id = ++static_remote_count;
    this->m_remote_ep = remote_ep;
    this->m_local_ep = local_ep;
-
-   this->m_context.set_options(boost::asio::ssl::context::default_workarounds| boost::asio::ssl::context::tlsv12);//| boost::asio::ssl::context::single_dh_use);
-   this->m_context.set_password_callback(boost::bind(&RemoteProxyHost::get_password, this));
-   this->m_context.set_verify_mode(boost::asio::ssl::context::verify_peer|boost::asio::ssl::context::verify_fail_if_no_peer_cert);
 
 #ifdef _WIN32
    // #if (OPENSSL_VERSION_NUMBER < 0x00905100L)
@@ -560,12 +557,6 @@ void RemoteProxyHost::dolog( const std::string &_line )
       this->m_log = _line;
    }
    log().add( " Host port: " + mylib::to_string( this->m_local_port ) + ": " + _line );
-}
-
-
-std::string RemoteProxyHost::get_password() const
-{
-   return "1234";
 }
 
 

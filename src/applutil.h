@@ -649,4 +649,6 @@ void read_with_timeout(SyncReadStream& s,
    }
 }
 
+void load_verify_file(boost::asio::ssl::context& ctx, const std::string& filename);
+
 #endif

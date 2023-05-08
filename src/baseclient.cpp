@@ -87,23 +87,6 @@ bool BaseClient::is_remote_connected(int index) const
       && (this->m_proxy_index == index || index == -1);
 }
 
-
-std::string BaseClient::get_password() const
-{
-   return "1234";
-}
-
-
-void BaseClient::ssl_prepare(boost::asio::ssl::context &ssl_context) const
-{
-   ssl_context.set_password_callback(boost::bind(&BaseClient::get_password,this));
-   ssl_context.set_verify_mode(boost::asio::ssl::context::verify_peer|boost::asio::ssl::context::verify_fail_if_no_peer_cert);
-   load_verify_file(ssl_context, my_certs_name);
-   ssl_context.use_certificate_chain_file(my_public_cert_name);
-   ssl_context.use_private_key_file(my_private_key_name, boost::asio::ssl::context::pem);
-}
-
-
 void BaseClient::threadproc_activate(int index)
 {
    if ( boost::get_system_time() < this->m_activate_stamp )
