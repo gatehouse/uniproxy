@@ -41,8 +41,8 @@ Source: "third/VC_redist.x64.exe"; Flags: dontcopy
 Source: "third/openssl.exe"; DestDir: "{app}"
 Source: "third/openssl.cfg"; DestDir: "{app}"
 Source: "third/nssm.exe"; DestDir: "{app}"; Check: GetInstallService()
-;Source: "third/libcrypto-1_1-x64.dll"; DestDir: "{app}"
-;Source: "third/libssl-1_1-x64.dll"; DestDir: "{app}"
+Source: "third/libcrypto-3-x64.dll"; DestDir: "{app}"
+Source: "third/libssl-3-x64.dll"; DestDir: "{app}"
 ;Source: "third/booster.dll"; DestDir: "{app}"
 ;Source: "third/cppcms.dll"; DestDir: "{app}"
 
