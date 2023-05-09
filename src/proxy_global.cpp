@@ -704,7 +704,7 @@ bool proxy_global::execute_openssl()
 {
    std::string params;
 #ifdef _WIN32
-   params = " -config openssl.cnf ";
+   params = " -config openssl.cfg ";
 #endif
    int res = process::execute_process("openssl",
                                       " req " + params + "-x509 -nodes -days 100000 -subj /C=DK/ST=Denmark/L=GateHouse/CN=" +
