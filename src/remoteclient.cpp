@@ -333,10 +333,10 @@ void RemoteProxyClient::remote_threadproc()
       {
          throw std::runtime_error("No local endpoints found");
       }
-      this->m_remote_connected = true; // Should perhaps be after the SSL handshake.
       this->dolog(this->dinfo() + "Performing SSL hansdshake connection");
       this->m_remote_socket.handshake( boost::asio::ssl::stream_base::server );
       this->dolog(this->dinfo() + "SSL connection ok");
+      this->m_remote_connected = true;
 
       bool hit = false;
       // See if we can find the relevant
@@ -398,7 +398,7 @@ void RemoteProxyClient::remote_threadproc()
       }
       this->dolog(this->dinfo() + "Performing logon procedure to " + ep);
       if ( ! this->m_host.m_plugin.connect_handler( this->m_local_socket, this->m_endpoint ) )
-      {     
+      {
          throw std::runtime_error("Failed plugin connect_handler for type: " + this->m_host.m_plugin.m_type );
       }
       this->dolog(this->dinfo() + "Completed logon procedure to " + ep);
@@ -466,6 +466,7 @@ void RemoteProxyClient::remote_threadproc()
       DOUT("synced shutdown remote socket done " << ec);
    }
    DOUT(this->dinfo() << "Thread stopped");
+   this->thread_ended=std::chrono::system_clock::now();
 }
 
 
@@ -487,7 +488,7 @@ RemoteProxyHost::RemoteProxyHost(mylib::port_type local_port, const std::vector<
    // #if (OPENSSL_VERSION_NUMBER < 0x00905100L)
    // By default it may be too low with a "no certificate returned" message.
    // According to google this may be the cause (indeed it was on the test setup). The 4 should at least be >= 2. The define above is also from google. But that is not good enough.
-   SSL_CTX_set_verify_depth( this->m_context.native_handle(), 4 ); 
+   SSL_CTX_set_verify_depth( this->m_context.native_handle(), 4 );
 #endif
    load_verify_file(this->m_context, my_certs_name);
    this->m_context.use_certificate_chain_file(my_public_cert_name);
@@ -523,7 +524,7 @@ void RemoteProxyHost::remove_remotes(const std::vector<RemoteEndpoint> &_remote_
       {
          // NB!! ASSERTD NOT RUNNING!!
          this->m_remote_ep.erase(help);
-      }  
+      }
    }
 }
 
@@ -694,7 +695,7 @@ void RemoteProxyHost::check_deadline(const boost::system::error_code& error)
       // Clean up the current client list and remove any non active clients.
       for ( auto iter2 = this->m_clients.begin(); iter2 != this->m_clients.end(); )
       {
-         if (!(*iter2)->is_active())
+         if (!(*iter2)->is_thread_active())
          {
             (*iter2)->stop();
             if (std::chrono::system_clock::now() > (*iter2)->stopped() + std::chrono::seconds(2))

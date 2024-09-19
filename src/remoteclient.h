@@ -47,7 +47,7 @@ public:
    void stop();
 
    // When terminating these threads e.g. due to lost connections, just leave them as zoombies
-   // Clean up will be done when starting new threads
+   // Clean up will be done when starting new threads or when checking deadline.
    void local_threadproc();
    void remote_threadproc();
    
@@ -80,6 +80,16 @@ public:
       return this->m_stopped;
    }
 
+   bool is_thread_active() const
+   {
+      if (this->thread_ended == std::chrono::system_clock::time_point())
+      {
+         return true;
+      }
+      // Wait 2 seconds after end of thread before we stop it.
+      return std::chrono::system_clock::now() - this->thread_ended < std::chrono::seconds(2);
+   }
+
 protected:
 
    void interrupt(bool synced);
@@ -94,6 +104,7 @@ protected:
    boost::asio::io_service& m_io_service;
 
    std::chrono::system_clock::time_point m_stopped = std::chrono::system_clock::time_point();
+   std::chrono::system_clock::time_point thread_ended = std::chrono::system_clock::time_point();
 
    RemoteProxyHost &m_host;
 };
